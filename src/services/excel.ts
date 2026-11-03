@@ -1,5 +1,6 @@
 import ExcelJS from 'exceljs'
-import type { Database, ImportRow, EmployeeImportRow, Version } from '../domain/types'
+import type { Cell, Database, ImportRow, EmployeeImportRow, Version } from '../domain/types'
+import { validOvertimeBase } from '../domain/absences'
 import { daysInMonth, iso, validDate } from '../domain/dates'
 import { effectiveCell, orderedEmployees } from '../domain/model'
 import { assignmentDetails, employeeStatistics } from '../domain/statistics'
@@ -22,6 +23,7 @@ export function fillColor(cell: ExcelJS.Cell): string {
   return ''
 }
 export function suggestColor(color: string) {
+  if (color.toUpperCase()==='#DBEAFE') return 'overtime'
   if (!/^#[0-9a-f]{6}$/i.test(color)) return color ? '' : 'photon'
   const [r, g, b] = [1, 3, 5].map(i => parseInt(color.slice(i, i + 2), 16)) as [number, number, number]
   if (r > 240 && g > 240 && b > 240) return 'photon'
@@ -45,12 +47,13 @@ export function discoverColors(sheet: ExcelJS.Worksheet, options: ImportOptions)
 export function parseCell(raw: string, color: string, map: Record<string, string>, db: Database): Pick<ImportRow, 'cell' | 'error' | 'skip'> {
   const text = raw.trim().replace(/[UＵ]+$/i, '').trim(), mapped = color ? map[color] : 'photon'
   const result = (kind: 'rest' | 'vacation' | 'leave') => ({ cell: { kind, locked: true, source: 'import' as const, note: raw }, error: '' })
+  if (/^(加班|加)$/.test(text)) return {cell:{kind:'overtime',locked:true,source:'import',note:raw,...(['rest','vacation'].includes(mapped || '') ? {overtimeBase:{kind:mapped as 'rest'|'vacation',locked:true,source:'import',note:mapped==='rest'?'休息':'预定休假'}} : {})},error:''}
   if (/^(请|请假|事后请假|事假|病假)$/.test(text)) return result('leave')
   if (/^(预|预定休假|计划休假|休假|年假|假|rl|r1|al)$/i.test(text)) return result('vacation')
   if (mapped === 'vacation') return result('vacation')
   if (mapped === 'rest' || /^(休|休息)$/.test(text)) return result('rest')
   if (mapped === 'leave') return result('leave')
-  if (/^(定位|加班)$/.test(text)) return { skip: true, error: '' }
+  if (text==='定位') return { skip: true, error: '' }
   if (!text || text === '—' || text === '-' || text === '未分配') return { cell: text === '未分配' ? { kind: 'unassigned', locked: false, source: 'import' } : undefined, error: '' }
   const category = text.includes('光子') ? '光子' : text.includes('白') ? '白' : text.includes('早') ? '早' : text.includes('晚') ? '晚' : text.includes('中') ? '中' : undefined
   if (!category) return { error: `未知标记“${raw}”，请修正或选择跳过` }
@@ -70,6 +73,15 @@ function columnDate(cell: ExcelJS.Cell, month: string) {
   const day = text.match(/^(\d{1,2})(?:日)?$/)
   return day ? `${month}-${String(Number(day[1])).padStart(2, '0')}` : ''
 }
+function readOvertimeNote(cell: Cell | undefined, note: string) {
+  if (cell?.kind!=='overtime') return ''
+  cell.locked=true
+  const raw=note.match(/(?:^|\n)加班原状态:([^\n]+)/)?.[1]
+  if (!raw) return ''
+  try {const base:unknown=JSON.parse(raw);if(!validOvertimeBase(base))throw new Error();cell.overtimeBase=base;return ''}
+  catch {return '加班原状态备注无效，请重新导出或核对原文件'}
+}
+const exportCellNote=(cell:Cell)=>`锁定:${cell.locked?'是':'否'}${cell.kind==='overtime'?`\n加班原状态:${JSON.stringify(cell.overtimeBase)}`:''}${cell.note?`\n原始备注:${cell.note}`:''}`
 export function previewSheet(sheet: ExcelJS.Worksheet, db: Database, options: ImportOptions): ImportRow[] {
   if (options.format === 'detail') return previewDetails(sheet,db,options)
   const dates = new Map<number, string>(), rows: ImportRow[] = []
@@ -93,6 +105,7 @@ export function previewSheet(sheet: ExcelJS.Worksheet, db: Database, options: Im
       const note = typeof excelCell.note === 'string' ? excelCell.note : ''
       if (result.cell && note.includes('原始备注:')) result.cell.note = note.split('原始备注:').slice(1).join('原始备注:')
       if (result.cell && note.includes('锁定:否')) result.cell.locked = false
+      error=readOvertimeNote(result.cell,note) || error
       rows.push({ row: r, employeeId: matches.length === 1 ? matches[0]!.id : undefined, code, name, date, cell: result.cell, raw, color, error, skip: result.skip })
     }
   }
@@ -112,7 +125,7 @@ function previewDetails(sheet: ExcelJS.Worksheet, db: Database, options: ImportO
     const dateCell = sheet.getCell(r,options.dateColumn || 1)
     const date = dateCell.value instanceof Date ? iso(dateCell.value) : dateCell.text.trim().replace(/\//g,'-').replace(/^(\d{4})-(\d{1,2})-(\d{1,2})$/,(_,y,m,d) => `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`)
     const shiftCell = sheet.getCell(r,options.shiftColumn || 5), status = options.statusColumn ? sheet.getCell(r,options.statusColumn).text.trim() : ''
-    const raw = status && /休|假|未分配/.test(status) ? status : shiftCell.text.trim()
+    const raw = status && /休|假|未分配|加班/.test(status) ? status : shiftCell.text.trim()
     const roomName = options.roomColumn ? sheet.getCell(r,options.roomColumn).text.trim() : ''
     const room = db.rooms.find(x => x.name === roomName || x.id === roomName || ({red:'红',orange:'橙',blue:'蓝',photon:'无色'} as Record<string,string>)[x.id] === roomName)
     const color = room ? `room:${room.id}` : fillColor(shiftCell)
@@ -128,6 +141,7 @@ function previewDetails(sheet: ExcelJS.Worksheet, db: Database, options: ImportO
     if (seen.has(identity)) error = '文件中同一员工日期重复，请合并重复行'
     seen.add(identity)
     if (result.cell && options.lockColumn && /^(否|false|0)$/i.test(sheet.getCell(r,options.lockColumn).text.trim())) result.cell.locked = false
+    error=readOvertimeNote(result.cell,typeof shiftCell.note==='string'?shiftCell.note:'') || error
     rows.push({row:r,employeeId:matches.length === 1 ? matches[0]!.id : undefined,code,name,date,raw,color,cell:result.cell,error,skip:result.skip})
   }
   return rows
@@ -153,21 +167,27 @@ export function exportWorkbook(db: Database, version: Version) {
       const value = effectiveCell(db, version, employee, date), cell = row.getCell(index + 3)
       if (!value) return
       const shift = db.shifts.find(s => s.id === value.shiftId), room = db.rooms.find(r => r.id === shift?.roomId)
-      cell.value = value.kind === 'rest' ? '休' : value.kind === 'vacation' ? '预定休假' : value.kind === 'leave' ? '事后请假' : value.kind === 'shift' ? shift?.category || '' : '未分配'
+      cell.value = value.kind === 'overtime' ? '加班' : value.kind === 'rest' ? '休' : value.kind === 'vacation' ? '预定休假' : value.kind === 'leave' ? '事后请假' : value.kind === 'shift' ? shift?.category || '' : '未分配'
       if (value.kind === 'rest') { cell.fill = solid('#555F65'); cell.font = { color: { argb: 'FFFFFFFF' } } }
       else if (value.kind === 'vacation') cell.fill = solid('#FFF0A8')
       else if (value.kind === 'leave') cell.fill = solid('#EDE4FF')
+      else if (value.kind === 'overtime') cell.fill = solid('#DBEAFE')
       else if (room) { cell.fill = solid(room.color); cell.font = { color: { argb: `FF${room.ink.slice(1)}` } } }
-      cell.note = `锁定:${value.locked ? '是' : '否'}${value.note ? `\n原始备注:${value.note}` : ''}`
+      cell.note = exportCellNote(value)
     })
   }
   sheet.columns.forEach((column, index) => column.width = index < 2 ? 14 : 7)
   styleSheet(sheet)
   const statistics = workbook.addWorksheet('员工统计')
-  statistics.addRow(['编号', '姓名', '出勤', '早', '中', '晚', '白', '光子', '休息', '预定休假', '事后请假', '未分配', '早段达成', '晚段达成'])
-  for (const r of employeeStatistics(db, version)) statistics.addRow([r.employee.code, r.employee.name, r.work, ...['早', '中', '晚', '白', '光子'].map(c => r.categories[c]), r.rest, r.vacation, r.leave, r.empty, r.early ? '是' : '否', r.late ? '是' : '否'])
-  const details = workbook.addWorksheet('排班明细'); details.addRow(['日期', '员工编号', '姓名', '房间', '班次', '锁定'])
-  for (const r of assignmentDetails(db, version)) details.addRow([r.date, r.code, r.employee, r.room, r.category, r.locked ? '是' : '否'])
+  statistics.addRow(['编号', '姓名', '出勤（含加班）', '早', '中', '晚', '白', '光子', '加班', '休息', '预定休假', '事后请假', '未分配', '早段达成', '晚段达成'])
+  for (const r of employeeStatistics(db, version)) statistics.addRow([r.employee.code, r.employee.name, r.work, ...['早', '中', '晚', '白', '光子'].map(c => r.categories[c]), r.overtime,r.rest, r.vacation, r.leave, r.empty, r.early ? '是' : '否', r.late ? '是' : '否'])
+  const details = workbook.addWorksheet('排班明细'); details.addRow(['日期', '员工编号', '姓名', '房间', '班次', '锁定','状态','说明'])
+  for (const r of assignmentDetails(db, version)) {
+    const employee=db.employees.find(e=>e.code===r.code)!
+    const c=version.cells[`${employee.id}|${r.date}`]!
+    const row=details.addRow([r.date,r.code,r.employee,r.room,r.category,r.locked?'是':'否',r.category==='加班'?'加班':'',c.note || ''])
+    row.getCell(5).note=exportCellNote(c)
+  }
   const plans = workbook.addWorksheet('员工休假计划'); plans.addRow(['日期','员工编号','姓名','房间','班次','锁定','状态','说明'])
   for (const p of version.vacationPlans) {
     const e = db.employees.find(e => e.id === p.employeeId)
@@ -181,7 +201,7 @@ export function exportWorkbook(db: Database, version: Version) {
   const pairs = workbook.addWorksheet('每日配对'); pairs.addRow(['日期', '房间', '班次', '应排', '实排', '缺口', '超额', '人员'])
   for (const r of coverage(db, version)) { const shift = db.shifts.find(s => s.id === r.shiftId)!; pairs.addRow([r.date, db.rooms.find(x => x.id === shift.roomId)?.name, shift.category, r.expected, r.actual, r.gap, r.excess, r.employeeIds.map(id => db.employees.find(e => e.id === id)?.name).join('、')]) }
   const meta = workbook.addWorksheet('说明与图例')
-  meta.addRows([['项目', '内容'], ['月份', version.month], ['版本', version.name], ['状态', version.status === 'confirmed' ? '已确认' : version.status === 'imported' ? '历史导入' : '草稿'], ['版本编号', version.id], ['统计口径', '按实际日期计人天；完整段按开始月归属；不计算加班和工时'], ['使用说明', '重新导入月度排班页：表头行1、数据行2、编号列1、姓名列2、日期起始列3。请确认颜色映射。'], ...db.rooms.map(r => [r.name, r.color]), ['休息', '#555F65'], ['预定休假', '#FFF0A8'], ['事后请假', '#EDE4FF']])
+  meta.addRows([['项目', '内容'], ['月份', version.month], ['版本', version.name], ['状态', version.status === 'confirmed' ? '已确认' : version.status === 'imported' ? '历史导入' : '草稿'], ['版本编号', version.id], ['统计口径', '按实际日期计人天；加班计入出勤并单列，不占八班名额；完整段按开始月归属；不计算工时'], ['使用说明', '重新导入月度排班页：表头行1、数据行2、编号列1、姓名列2、日期起始列3。请确认颜色映射。'], ...db.rooms.map(r => [r.name, r.color]), ['休息', '#555F65'], ['预定休假', '#FFF0A8'], ['事后请假', '#EDE4FF'], ['加班', '#DBEAFE']])
   const employees = workbook.addWorksheet('员工资料'); employees.addRow(['编号', '姓名', '顺序', '生效日期', '停用日期', '备注'])
   for (const e of orderedEmployees(db)) employees.addRow([e.code, e.name, e.order + 1, e.from, e.to, e.note])
   for (const s of [statistics, details, plans, leaves, pairs, meta, employees]) { s.columns.forEach(c => c.width = 18); styleSheet(s) }

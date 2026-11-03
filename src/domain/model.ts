@@ -2,6 +2,7 @@ import type { Cell, Database, Employee, RuleSettings, Segment, Version } from '.
 import { addDays, addMonths, daysInMonth, isWeekend, uid } from './dates'
 
 export const isAbsence = (cell?: Cell) => cell?.kind === 'vacation' || cell?.kind === 'leave'
+export const isOvertimeVacation = (cell?: Cell) => cell?.kind === 'overtime' && cell.overtimeBase?.kind === 'vacation'
 export const key = (employeeId: string, date: string) => `${employeeId}|${date}`
 export const activeOn = (employee: Employee, date: string) => (!employee.from || employee.from <= date) && (!employee.to || date < employee.to)
 export const orderedEmployees = (db: Database) => [...db.employees].sort((a, b) => a.order - b.order || a.code.localeCompare(b.code))
@@ -26,6 +27,7 @@ export function getRawCell(db: Database, version: Version, employeeId: string, d
 function rests(db: Database, version: Version, employee: Employee, date: string, rules: RuleSettings) {
   if (!activeOn(employee, date)) return true
   const cell = getRawCell(db, version, employee.id, date), owner = versionOnDate(db,version,date)
+  if (cell?.kind === 'overtime') return cell.overtimeBase?.kind === 'rest' || isOvertimeVacation(cell) && rules.leaveSplits || !openOn(db,date,owner)
   if (isAbsence(cell)) return rules.leaveSplits || !openOn(db,date,owner)
   if (cell) return cell.kind === 'rest'
   return !openOn(db, date, owner)
@@ -53,7 +55,7 @@ export function workSegments(db: Database, version: Version, employee: Employee)
 export function completedSegments(db: Database, version: Version, employee: Employee) {
   return workSegments(db, version, employee).flatMap(segment => {
     if (!segment.bounded) return []
-    const workable = segment.dates.filter(date => !isAbsence(getRawCell(db, version, employee.id, date)))
+    const workable = segment.dates.filter(date => {const c=getRawCell(db,version,employee.id,date);return !isAbsence(c) && !isOvertimeVacation(c)})
     const cells = workable.map(date => getRawCell(db, version, employee.id, date))
     const first = cells[0]
     if (!workable.length || !first || first.kind !== 'shift' || !cells.every(c => c?.kind === 'shift' && c.shiftId === first.shiftId)) return []

@@ -1,4 +1,4 @@
-import type { Database, Version } from './types'
+import type { Database, OvertimeBase, Version } from './types'
 import { daysInMonth } from './dates'
 import { activeOn, completedSegments, effectiveCell, key, orderedEmployees } from './model'
 import { coverage } from './validation'
@@ -9,7 +9,7 @@ export function employeeStatistics(db: Database, version: Version) {
     const cells = dates.map(d => effectiveCell(db, version, employee, d))
     const complete = completedSegments(db, version, employee).filter(s => s.start.startsWith(version.month))
     return {
-      employee, work: cells.filter(c => c?.kind === 'shift').length,
+      employee, work: cells.filter(c => c?.kind === 'shift' || c?.kind==='overtime').length, overtime: cells.filter(c=>c?.kind==='overtime').length,
       categories: Object.fromEntries(['早', '中', '晚', '白', '光子'].map(category => [category, cells.filter(c => c?.kind === 'shift' && db.shifts.find(s => s.id === c.shiftId)?.category === category).length])),
       rooms: Object.fromEntries(db.rooms.map(r => [r.id, cells.filter(c => c?.kind === 'shift' && db.shifts.find(s => s.id === c.shiftId)?.roomId === r.id).length])),
       vacation: cells.filter(c => c?.kind === 'vacation').length, rest: cells.filter(c => c?.kind === 'rest').length, leave: cells.filter(c => c?.kind === 'leave').length,
@@ -21,7 +21,7 @@ export function employeeStatistics(db: Database, version: Version) {
 export function summary(db: Database, version: Version) {
   const rows = coverage(db, version), expected = rows.reduce((n, r) => n + r.expected, 0), actual = rows.reduce((n, r) => n + r.actual, 0)
   const count = rows.filter(r => r.expected > 0).length, pairs = rows.filter(r => r.expected > 0 && r.expected === r.actual).length
-  return { expected, actual, gap: rows.reduce((n, r) => n + r.gap, 0), excess: rows.reduce((n, r) => n + r.excess, 0), coverage: expected ? rows.reduce((n, r) => n + Math.min(r.expected, r.actual), 0) / expected : null, paired: count ? pairs / count : null, vacation: employeeStatistics(db, version).reduce((n,r) => n+r.vacation,0), leave: employeeStatistics(db, version).reduce((n, r) => n + r.leave, 0), openDays: daysInMonth(version.month).filter(d => version.calendar[d]).length }
+  return { expected, actual, overtime:employeeStatistics(db,version).reduce((n,r)=>n+r.overtime,0), gap: rows.reduce((n, r) => n + r.gap, 0), excess: rows.reduce((n, r) => n + r.excess, 0), coverage: expected ? rows.reduce((n, r) => n + Math.min(r.expected, r.actual), 0) / expected : null, paired: count ? pairs / count : null, vacation: employeeStatistics(db, version).reduce((n,r) => n+r.vacation,0), leave: employeeStatistics(db, version).reduce((n, r) => n + r.leave, 0), openDays: daysInMonth(version.month).filter(d => version.calendar[d]).length }
 }
 export function debtFulfillment(db: Database, debt: Database['debts'][number]) {
   for (const [month, id] of Object.entries(db.activeVersions).sort(([a], [b]) => a.localeCompare(b))) {
@@ -33,11 +33,13 @@ export function debtFulfillment(db: Database, debt: Database['debts'][number]) {
   }
   return undefined
 }
-export function assignmentDetails(db: Database, version: Version, employeeId?: string, category?: string) {
+export interface AssignmentDetail {date:string;employee:string;code:string;room:string;category:string;locked:boolean;overtimeBase?:OvertimeBase}
+export function assignmentDetails(db: Database, version: Version, employeeId?: string, category?: string):AssignmentDetail[] {
   return daysInMonth(version.month).flatMap(date => db.employees.filter(e => version.employeeIds.includes(e.id) && (!employeeId || e.id === employeeId)).flatMap(e => {
-    const cell = version.cells[key(e.id, date)]; if (!cell || cell.kind !== 'shift') return []
+    const cell = version.cells[key(e.id, date)]; if (!cell || cell.kind !== 'shift' && cell.kind!=='overtime') return []
     const shift = db.shifts.find(s => s.id === cell.shiftId), room = db.rooms.find(r => r.id === shift?.roomId)
-    if (category && shift?.category !== category) return []
-    return [{ date, employee: e.name, code: e.code, room: room?.name || '', category: shift?.category || '', locked: cell.locked }]
+    const label=cell.kind==='overtime'?'加班':shift?.category || ''
+    if (category && label !== category) return []
+    return [{ date, employee: e.name, code: e.code, room: room?.name || '', category:label, locked: cell.locked, overtimeBase:cell.overtimeBase }]
   }))
 }

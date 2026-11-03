@@ -49,9 +49,9 @@ export function generate(db: Database, month: string, mode: 'fill' | 'rebuild' =
   template.name = `自动排班 ${new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`
   if (base) for (const [k, c] of Object.entries(base.cells)) {
     const [employeeId,date] = k.split('|') as [string,string]
-    if (template.cells[k]?.kind === 'vacation' && c.kind !== 'leave') continue
+    if (template.cells[k]?.kind === 'vacation' && c.kind !== 'leave' && c.kind !== 'overtime') continue
     if (c.kind === 'vacation' && c.planId && !vacationOn(db,employeeId,date)) continue
-    if (isAbsence(c) || (c.kind === 'rest' && c.source !== 'calendar') || c.locked && c.source !== 'calendar' || mode === 'fill' && c.kind === 'shift' || c.kind === 'unassigned' && c.source === 'manual') template.cells[k] = { ...c }
+    if (isAbsence(c) || c.kind==='overtime' || (c.kind === 'rest' && c.source !== 'calendar') || c.locked && c.source !== 'calendar' || mode === 'fill' && c.kind === 'shift' || c.kind === 'unassigned' && c.source === 'manual') template.cells[k] = { ...c }
   }
   const bans = new Set(employees.filter(e => priorPhoton(db, month, e).length).map(e => e.id))
   const segments = employees.flatMap(e => workSegments(db, template, e))
@@ -93,7 +93,7 @@ export function generate(db: Database, month: string, mode: 'fill' | 'rebuild' =
         if (bans.has(employee.id) && shift.category === '白' && !done.has('白')) score += 500
         if (pendingDebts.some(d => d.employeeId === employee.id && d.category === shift.category && d.due <= month)) score += 200
         // Prefer workers who can cover the remaining segment, preserving flexible substitutes.
-        const futureAvailable = segment.dates.filter(d => d >= date && d.startsWith(month) && !isAbsence(template.cells[key(employee.id, d)])).length
+        const futureAvailable = segment.dates.filter(d => d >= date && d.startsWith(month) && !isAbsence(template.cells[key(employee.id, d)]) && template.cells[key(employee.id,d)]?.kind!=='overtime').length
         score += futureAvailable * 5 + noise(`${employee.id}:${shift.id}`, attempt) * (attempt === 0 ? 0 : 2)
         return score
       })

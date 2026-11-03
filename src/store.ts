@@ -2,10 +2,14 @@ import { computed, ref, shallowRef, toRaw } from 'vue'
 import type { Cell, Database, Employee, GenerateResult, ImportRow, EmployeeImportRow, Page } from './domain/types'
 import { daysInMonth, monthNow, uid } from './domain/dates'
 import { activeOn, activeVersion, emptyDatabase, inputHash, key, openOn, required, editableVersion } from './domain/model'
-import { adjustCell, cancelLeave, removeVacationPlan, saveVacationPlan } from './domain/absences'
+import { adjustCell, availableCell, cancelLeave, cancelOvertime, removeVacationPlan, saveVacationPlan } from './domain/absences'
 import type { VacationPlan } from './domain/types'
 import { applyScheduleImport } from './domain/schedule-import'
 import { applyEmployeeImport } from './domain/employee-import'
+import { applyDemandChanges } from './domain/demand'
+import type { DemandAction } from './domain/demand'
+import { applyScheduleSelection, clearMonthSchedule } from './domain/schedule-edit'
+import type { CellTarget, SelectionAction } from './domain/schedule-edit'
 import { createDemo } from './domain/demo'
 import { validate } from './domain/validation'
 import { parseDatabase, loadDatabase, saveDatabase } from './services/storage'
@@ -63,6 +67,12 @@ export async function saveLeaveAdjustment(employeeId: string, dates: string[], n
 }
 export async function removeLeave(employeeId: string, date: string) { return commit('已撤销事后请假',date,draft => { cancelLeave(draft,employeeId,date) }) }
 export async function createMonth() { return commit('已建立月度草稿', month.value, draft => { editable(draft, month.value) }) }
+export async function saveDemandSettings(target:string, dates:string[], actions:Record<string,DemandAction>) {
+  let plan:ReturnType<typeof applyDemandChanges> | undefined
+  const success=await commit('已更新按日期需求',`${target}；日期：${dates.join('、')}`,draft=>{plan=applyDemandChanges(draft,target,dates,actions)},true)
+  if (success && plan) notify(`已保存${plan.eligible.length}天的${plan.changes.length}项需求配置${plan.skipped.length?`，跳过${plan.skipped.length}个休息日`:''}；重新生成后生效`)
+  return success
+}
 export async function generateMonth(target: string, mode: 'fill' | 'rebuild') {
   if (generating.value || saving.value) return false
   if (!db.value.employees.length) { notify('请先新增或导入员工', 'error'); return false }
@@ -94,6 +104,25 @@ export async function editCells(employeeId: string, dates: string[], cell: Cell)
     for (const date of dates) adjustCell(draft,employeeId,date,cell)
   })
 }
+export async function editCalendarCells(employeeId: string, dates: string[], cell: Cell) {
+  return commit('已调整工作日历中的个人安排',`${dates.length}天`,draft=>{for(const date of dates)adjustCell(draft,employeeId,date,cell,'calendar')})
+}
+export async function removeOvertime(employeeId: string, date: string) {return commit('已撤销加班',date,draft=>{cancelOvertime(draft,employeeId,date)})}
+export async function editSelectedCells(targets: CellTarget[], action: SelectionAction) {
+  const target = month.value, versionId = current.value?.id
+  if (!versionId || generating.value) return false
+  let result: ReturnType<typeof applyScheduleSelection> | undefined
+  const success = await commit(action.type === 'adjust' ? '已保存批量调整' : action.locked ? '已批量锁定班次' : '已批量解锁班次', `${target}，选择${targets.length}格`, draft => {
+    result = applyScheduleSelection(draft,target,versionId,targets,action)
+  },true)
+  if (success && result) notify(`已${action.type === 'adjust' ? '调整' : action.locked ? '锁定' : '解锁'}${result.changed}格${result.skipped ? `，跳过${result.skipped}格（含${result.protected}格休息或假期）` : ''}`)
+  return success
+}
+export async function clearCurrentSchedule(target: string, versionId: string) {
+  if (generating.value) { notify('请等待自动排班完成后再清空', 'error'); return false }
+  if (target !== month.value) { notify('当前月份已变化，请重新核对后操作','error'); return false }
+  return commit('已清空当月排班',`${target}；原版本保留，休息和假期不变`,draft => {clearMonthSchedule(draft,target,versionId)})
+}
 export async function importEmployees(rows: EmployeeImportRow[], filename: string, allowUpdates: boolean) {
   return commit('已导入员工名单',filename,draft => { applyEmployeeImport(draft,rows,allowUpdates) })
 }
@@ -114,7 +143,8 @@ export async function setCalendar(date: string, open: boolean, reason: string) {
     for (const employee of draft.employees) {
       if (!activeOn(employee, date)) continue
       const k = key(employee.id, date), cell = v.cells[k]
-      if (!cell || cell.source === 'calendar' || cell.source === 'auto') {
+      if (cell?.kind==='overtime' && (cell.overtimeBase?.source==='calendar' || cell.overtimeBase?.kind==='unassigned')) cell.overtimeBase=availableCell(draft,employee.id,date) as NonNullable<Cell['overtimeBase']>
+      else if (!cell || cell.source === 'calendar' || cell.source === 'auto') {
         if (open) delete v.cells[k]; else v.cells[k] = { kind: 'rest', locked: true, source: 'calendar', note: reason }
       }
     }

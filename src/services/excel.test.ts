@@ -43,10 +43,10 @@ describe('Excel导入导出', () => {
     sheet.addRow(['2026-06-01','E001','测试员工','橙房间','早','是'])
     expect(previewSheet(sheet,db,{month:'2026-06',headerRow:1,startRow:2,nameColumn:3,codeColumn:2,dateStartColumn:1,colorMap:{},format:'detail',dateColumn:1,roomColumn:4,shiftColumn:5})[1]!.error).toContain('重复')
   })
-  it('加班和定位不创建班次，也不覆盖灰底休息', () => {
+  it('定位仅作附注，加班是保留原休息状态的独立安排', () => {
     const db = emptyDatabase()
     expect(parseCell('定位','',{},db).skip).toBe(true)
-    expect(parseCell('加班','#777777',{'#777777':'rest'},db).cell?.kind).toBe('rest')
+    expect(parseCell('加班','#777777',{'#777777':'rest'},db).cell).toMatchObject({kind:'overtime',locked:true,overtimeBase:{kind:'rest'}})
   })
   it('无效备份和重复员工编号在写入之前被拒绝', () => {
     expect(() => assertDatabase({schema:1})).toThrow()

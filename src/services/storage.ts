@@ -1,5 +1,6 @@
 import type { Database } from '../domain/types'
 import { validDate } from '../domain/dates'
+import { validOvertimeBase } from '../domain/absences'
 
 let revision: string | undefined
 const databaseName = 'banxu-local-v2'
@@ -49,7 +50,8 @@ export function assertDatabase(value: unknown): asserts value is Database {
     versionIds.add(v.id)
     for (const [k, c] of Object.entries(v.cells)) {
       const [employeeId, date] = k.split('|')
-      if (!ids.has(employeeId!) || !date || !validDate(date) || !date.startsWith(v.month) || !c || !['shift', 'rest', 'vacation', 'leave', 'unassigned'].includes(c.kind) || c.kind === 'shift' && !shiftIds.has(c.shiftId!)) throw new Error('排班明细包含未知员工、日期或班次')
+      if (!ids.has(employeeId!) || !date || !validDate(date) || !date.startsWith(v.month) || !c || !['shift', 'overtime', 'rest', 'vacation', 'leave', 'unassigned'].includes(c.kind) || c.kind === 'shift' && !shiftIds.has(c.shiftId!)) throw new Error('排班明细包含未知员工、日期或班次')
+      if (c.kind==='overtime' && (!c.locked || !validOvertimeBase(c.overtimeBase))) throw new Error('加班原状态或保护设置无效')
     }
     if (v.employeeIds.some(id => !ids.has(id)) || new Set(v.employeeIds).size !== v.employeeIds.length) throw new Error('版本员工名单无效')
   }

@@ -1,7 +1,7 @@
 import type { Database, ImportRow } from './types'
 import { addMonths, uid } from './dates'
 import { activeVersion, editableVersion, inputHash, key, newVersion } from './model'
-import { saveVacationPlan, vacationOn } from './absences'
+import { makeOvertimeCell, saveVacationPlan, vacationOn } from './absences'
 
 export function applyScheduleImport(draft: Database, rows: ImportRow[], target: string, purpose: string, filename: string, allowNew: boolean) {
     const included = rows.filter(r => !r.skip)
@@ -38,6 +38,9 @@ export function applyScheduleImport(draft: Database, rows: ImportRow[], target: 
         const existing = vacationOn(draft,employeeId,row.date)
         saveVacationPlan(draft,{id:existing?.id,employeeId,month:target,dates:existing?.dates || [row.date],reason:row.cell.note || `导入：${filename}`,source:'import'})
         if (v.cells[key(employeeId,row.date)]?.kind !== 'leave') v.cells[key(employeeId,row.date)] = {kind:'vacation',locked:true,source:'plan',planId:vacationOn(draft,employeeId,row.date)!.id,note:row.cell.note}
+      } else if (row.cell.kind==='overtime') {
+        if (row.cell.overtimeBase?.kind==='vacation' && !vacationOn(draft,employeeId,row.date)) saveVacationPlan(draft,{employeeId,month:target,dates:[row.date],reason:row.cell.overtimeBase.note || '导入加班前的预定休假',source:'import'})
+        v.cells[key(employeeId,row.date)]=makeOvertimeCell(draft,employeeId,row.date,row.cell,v)
       } else {
         if (vacationOn(draft,employeeId,row.date) && row.cell.kind !== 'leave') {
           if (['history','schedule'].includes(purpose)) throw new Error(`${row.date}已有预定休假，与导入排班冲突；请先核对休假计划`)
@@ -46,7 +49,7 @@ export function applyScheduleImport(draft: Database, rows: ImportRow[], target: 
         v.cells[key(employeeId,row.date)] = structuredClone(row.cell)
       }
     }
-    for (const row of rows.filter(r => r.skip && ['定位', '加班'].includes(r.raw))) {
+    for (const row of rows.filter(r => r.skip && r.raw==='定位')) {
       const employeeId = row.employeeId || mapping.get(row.code || row.name)
       if (employeeId) { const k = key(employeeId,row.date), cell = v.cells[k]; if (cell) cell.note = [cell.note, row.raw].filter(Boolean).join('；'); else v.cells[k] = {kind:'unassigned',locked:false,source:'import',note:row.raw} }
     }
