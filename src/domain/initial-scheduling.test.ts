@@ -24,7 +24,8 @@ describe('无上月记录时首次排班',() => {
     const db=fixture(16),may=mount(db,newVersion(db,'2026-05'))
     for (const d of ['2026-05-04','2026-05-05','2026-05-06','2026-05-07','2026-05-08']) may.cells[key('e0',d)]={kind:'shift',shiftId:'photon',locked:true,source:'import'}
     const result=generate(db,'2026-07','rebuild',1)
-    expect(result.version.historyMode).toBe('initial');expect(result.debts).toEqual([])
+    expect(result.version.historyMode).toBe('initial');expect(result.debts.filter(d=>d.id.startsWith('photon-white:'))).toEqual([])
+    expect(result.version.run?.preparation?.pendingDebts.map(d=>d.category)).toEqual(['早','晚'])
     expect(validate(db,result.version).some(i => i.rule==='H05')).toBe(false)
     expect(coverage(db,result.version).filter(r => r.expected).every(r => r.actual===2)).toBe(true)
   })

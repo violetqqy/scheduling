@@ -67,7 +67,7 @@ describe('预定休假与事后请假',() => {
     expect(() => saveVacationPlan(db,input([]))).toThrow('至少一天')
     db.employees[0]!.to = '2026-06-20'
     expect(() => saveVacationPlan(db,input(['2026-06-20']))).toThrow('当月')
-    expect(() => adjustCell(db,'e0','2026-06-02',{kind:'shift',shiftId:'red-early',locked:true,source:'manual'})).toThrow('调整休假计划')
+    adjustCell(db,'e0','2026-06-02',{kind:'shift',shiftId:'red-early',locked:true,source:'manual'});expect(db.vacationPlans[0]!.dates).toEqual(input().dates)
   })
   it('休假与请假人天互斥统计，不计出勤也不计未分配',() => {
     const db = fixture(); saveVacationPlan(db,input()); adjustCell(db,'e0','2026-06-02',{kind:'leave',locked:true,source:'manual'})
@@ -76,13 +76,13 @@ describe('预定休假与事后请假',() => {
     expect(row.empty + row.rest + row.vacation + row.leave + row.work).toBe(30)
     expect(db.vacationPlans[0]!.dates).toHaveLength(2)
   })
-  it('休假默认不切段且扣除可工作日，开启切段规则后可切段',() => {
+  it('休假固定不切段且扣除可工作日，旧切段开关不再生效',() => {
     const db = fixture(); saveVacationPlan(db,input(['2026-06-03','2026-06-06','2026-06-07'])); const v = activeVersion(db,'2026-06')!, e = db.employees[0]!
     for (const date of ['2026-06-01','2026-06-02','2026-06-04','2026-06-05']) v.cells[key('e0',date)] = {kind:'shift',shiftId:'red-early',locked:false,source:'auto'}
     expect(workSegments(db,v,e).find(s => s.start === '2026-06-01')?.end).toBe('2026-06-05')
     expect(completedSegments(db,v,e).find(s => s.start === '2026-06-01')?.days).toBe(4)
     v.ruleSettings.leaveSplits = true
-    expect(workSegments(db,v,e).find(s => s.start === '2026-06-01')?.end).toBe('2026-06-02')
+    expect(workSegments(db,v,e).find(s => s.start === '2026-06-01')?.end).toBe('2026-06-05')
   })
   it('新版备份可往返读取，旧版格式直接拒绝',() => {
     const db = fixture(); saveVacationPlan(db,input())

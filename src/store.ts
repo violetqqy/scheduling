@@ -12,6 +12,7 @@ import { applyScheduleSelection, clearMonthSchedule } from './domain/schedule-ed
 import type { CellTarget, SelectionAction } from './domain/schedule-edit'
 import { createDemo } from './domain/demo'
 import { validate } from './domain/validation'
+import { syncVacationDebts } from './domain/vacation-deferrals'
 import { parseDatabase, loadDatabase, saveDatabase } from './services/storage'
 
 export const LOGIN = { username: 'admin', password: 'Admin@123456' }
@@ -46,7 +47,7 @@ export async function commit(action: string, detail: string, change: (draft: Dat
   if (saving.value) { notify('上一项修改仍在保存，请稍后再试', 'error'); return false }
   saving.value = true
   try {
-    const draft = structuredClone(toRaw(db.value)); change(draft)
+    const draft = structuredClone(toRaw(db.value)); change(draft); syncVacationDebts(draft)
     draft.logs.unshift({ id: uid(), time: new Date().toISOString(), action, detail }); draft.logs = draft.logs.slice(0, 300)
     await saveDatabase(draft); db.value = draft
     if (!quiet) notify(action)
@@ -90,17 +91,23 @@ export async function generateMonth(target: string, mode: 'fill' | 'rebuild') {
     if (inputHash(db.value, target) !== hash) throw new Error('计算期间输入已变化，本次结果未写入，请重新生成')
     if (JSON.stringify([activeVersion(db.value,target)?.id, activeVersion(db.value,target)?.updated]) !== baseStamp) throw new Error('计算期间目标月份已被修改，本次结果未覆盖人工修改，请重新生成')
     const success = await commit('已生成排班草稿', `${target}，尝试${result.version.run?.attempts}个候选`, draft => {
-      draft.debts.push(...result.debts.filter(d => !draft.debts.some(existing => existing.id === d.id)))
-      result.version.inputHash = inputHash(draft, target)
+      draft.debts=draft.debts.filter(d=>!(d.id.startsWith('photon-white:') && d.due===target && !result.debts.some(next=>next.id===d.id)))
+      for(const debt of result.debts){const i=draft.debts.findIndex(d=>d.id===debt.id);if(i<0)draft.debts.push(debt);else draft.debts[i]=debt}
       draft.versions.push(result.version); draft.activeVersions[target] = result.version.id
+      syncVacationDebts(draft)
+      result.version.inputHash = inputHash(draft, target)
     })
     if (success) { month.value = target; navigate('schedule') }
     return success
   } catch (error) { notify(error instanceof Error ? error.message : '生成失败', 'error'); return false }
   finally { generating.value = false }
 }
+function cellDescription(cell:Cell){
+  const shift=db.value.shifts.find(s=>s.id===cell.shiftId)
+  return cell.kind==='custom'?`自定义：${cell.customName}`:cell.kind==='shift'?`${db.value.rooms.find(r=>r.id===shift?.roomId)?.name}·${shift?.category}班`:({rest:'休息',vacation:'预定休假',leave:'请假',overtime:'加班',unassigned:'未分配'} as Record<string,string>)[cell.kind]
+}
 export async function editCells(employeeId: string, dates: string[], cell: Cell) {
-  return commit('已保存人工调整', `${db.value.employees.find(e => e.id === employeeId)?.name}，${dates.length}天`, draft => {
+  return commit('已保存人工调整', `${db.value.employees.find(e=>e.id===employeeId)?.name}；${dates.join('、')}；${cellDescription(cell)}`, draft => {
     for (const date of dates) adjustCell(draft,employeeId,date,cell)
   })
 }
@@ -110,10 +117,10 @@ export async function editCalendarCells(employeeId: string, dates: string[], cel
 export async function removeOvertime(employeeId: string, date: string) {return commit('已撤销加班',date,draft=>{cancelOvertime(draft,employeeId,date)})}
 export async function editSelectedCells(targets: CellTarget[], action: SelectionAction) {
   const target = month.value, versionId = current.value?.id
-  if (!versionId || generating.value) return false
+  if (generating.value) return false
   let result: ReturnType<typeof applyScheduleSelection> | undefined
-  const success = await commit(action.type === 'adjust' ? '已保存批量调整' : action.locked ? '已批量锁定班次' : '已批量解锁班次', `${target}，选择${targets.length}格`, draft => {
-    result = applyScheduleSelection(draft,target,versionId,targets,action)
+  const success = await commit(action.type === 'adjust' ? '已保存批量调整' : action.locked ? '已批量锁定班次' : '已批量解锁班次', `${target}；${targets.map(t=>`${t.employeeId}:${t.date}`).join('、')}；${action.type==='adjust'?cellDescription(action.cell):action.locked?'锁定':'解锁'}`, draft => {
+    result = applyScheduleSelection(draft,target,versionId || editable(draft,target).id,targets,action)
   },true)
   if (success && result) notify(`已${action.type === 'adjust' ? '调整' : action.locked ? '锁定' : '解锁'}${result.changed}格${result.skipped ? `，跳过${result.skipped}格（含${result.protected}格休息或假期）` : ''}`)
   return success
@@ -134,9 +141,8 @@ export async function saveEmployee(employee: Employee) {
     if (index >= 0) draft.employees[index] = employee; else draft.employees.push(employee)
   })
 }
-export async function setCalendar(date: string, open: boolean, reason: string) {
-  if (!reason.trim()) { notify('请填写调休原因', 'error'); return false }
-  return commit('已调整工作日历', `${date} ${open ? '开班' : '休息'}：${reason}`, draft => {
+export async function setCalendar(date: string, open: boolean) {
+  return commit('已调整工作日历', `${date} ${open ? '开班' : '休息'}`, draft => {
     draft.calendar[date] = open
     const v = editable(draft, date.slice(0, 7)); v.calendar[date] = open
     for (const shift of draft.shifts) v.requirements[`${date}|${shift.id}`] = required(draft, date, shift.id)
@@ -145,7 +151,7 @@ export async function setCalendar(date: string, open: boolean, reason: string) {
       const k = key(employee.id, date), cell = v.cells[k]
       if (cell?.kind==='overtime' && (cell.overtimeBase?.source==='calendar' || cell.overtimeBase?.kind==='unassigned')) cell.overtimeBase=availableCell(draft,employee.id,date) as NonNullable<Cell['overtimeBase']>
       else if (!cell || cell.source === 'calendar' || cell.source === 'auto') {
-        if (open) delete v.cells[k]; else v.cells[k] = { kind: 'rest', locked: true, source: 'calendar', note: reason }
+        if (open) delete v.cells[k]; else v.cells[k] = { kind: 'rest', locked: true, source: 'calendar' }
       }
     }
   })

@@ -16,24 +16,22 @@ function fixture() {
   const version=newVersion(db,'2026-11');db.versions.push(version);db.activeVersions[version.month]=version.id
   return {db,version}
 }
-describe('休息与预定休假的月度编辑保护',()=>{
-  it('休息日和个人休息不能直接改班或绕道恢复可用，工作日历可解除个人休息',()=>{
-    const {db,version}=fixture()
-    adjustCell(db,'e0','2026-11-02',{kind:'rest',locked:true,source:'manual',note:'个人调休'})
-    for(const date of ['2026-11-01','2026-11-02']) for(const cell of [{kind:'shift' as const,shiftId:'red-early',locked:true,source:'manual' as const},{kind:'unassigned' as const,locked:false,source:'manual' as const}]) expect(()=>adjustCell(db,'e0',date,cell)).toThrow('工作日历')
-    expect(version.cells[key('e0','2026-11-02')]?.kind).toBe('rest')
-    adjustCell(db,'e0','2026-11-02',{kind:'unassigned',locked:false,source:'manual'},'calendar')
-    adjustCell(db,'e0','2026-11-02',{kind:'shift',shiftId:'red-early',locked:true,source:'manual'})
-    expect(version.cells[key('e0','2026-11-02')]?.kind).toBe('shift')
+describe('休息与预定休假的自由编辑',()=>{
+  it('休息日和手工休息可直接改班或恢复可用，不更改开班日历',()=>{
+    const {db,version}=fixture(),calendar=structuredClone(db.calendar)
+    adjustCell(db,'e0','2026-11-02',{kind:'rest',locked:true,source:'manual'})
+    for(const date of ['2026-11-01','2026-11-02'])for(const cell of [{kind:'shift' as const,shiftId:'red-early',locked:true,source:'manual' as const},{kind:'unassigned' as const,locked:false,source:'manual' as const}]){
+      adjustCell(db,'e0',date,cell);expect(version.cells[key('e0',date)]).toEqual(cell)
+    }
+    expect(db.calendar).toEqual(calendar)
   })
-  it('预定休假须先在工作日历取消，批量普通改班跳过保护格',()=>{
+  it('预定休假可逐格及批量改班，原休假计划继续保留',()=>{
     const {db,version}=fixture(),plan=saveVacationPlan(db,{employeeId:'e0',month:'2026-11',dates:['2026-11-02'],reason:'预定年假'})
     const shift:Cell={kind:'shift',shiftId:'red-early',locked:true,source:'manual'}
-    expect(()=>adjustCell(db,'e0','2026-11-02',shift)).toThrow('工作日历')
-    const result=applyScheduleSelection(db,'2026-11',version.id,[{employeeId:'e0',date:'2026-11-02'},{employeeId:'e1',date:'2026-11-02'}],{type:'adjust',cell:shift})
-    expect(result).toMatchObject({changed:1,protected:1})
-    removeVacationPlan(db,plan.id);adjustCell(db,'e0','2026-11-02',shift)
-    expect(version.cells[key('e0','2026-11-02')]).toEqual(shift)
+    adjustCell(db,'e0','2026-11-02',shift)
+    expect(applyScheduleSelection(db,'2026-11',version.id,[{employeeId:'e0',date:'2026-11-02'},{employeeId:'e1',date:'2026-11-02'}],{type:'adjust',cell:shift})).toMatchObject({changed:2,protected:0})
+    expect(db.vacationPlans).toEqual([plan])
+    expect(validate(db,version).some(i=>i.rule==='H06')).toBe(true)
   })
 })
 describe('加班状态、撤销与自动排班',()=>{
@@ -43,7 +41,6 @@ describe('加班状态、撤销与自动排班',()=>{
     for(const [employeeId,date] of [['e0','2026-11-02'],['e0','2026-11-01'],['e1','2026-11-03']])adjustCell(db,employeeId!,date!,overtime)
     expect(db.vacationPlans[0]).toEqual(plan)
     expect(version.cells[key('e0','2026-11-02')]).toMatchObject({kind:'overtime',locked:true,overtimeBase:{kind:'vacation',planId:plan.id,note:'原年假原因'}})
-    expect(()=>adjustCell(db,'e0','2026-11-02',{kind:'shift',shiftId:'red-early',locked:true,source:'manual'})).toThrow('工作日历')
     for(const [employeeId,date] of [['e0','2026-11-02'],['e0','2026-11-01'],['e1','2026-11-03']])cancelOvertime(db,employeeId!,date!)
     expect(version.cells[key('e0','2026-11-02')]).toMatchObject({kind:'vacation',note:'原年假原因'})
     expect(version.cells[key('e0','2026-11-01')]?.kind).toBe('rest')
@@ -68,16 +65,16 @@ describe('加班状态、撤销与自动排班',()=>{
     for(const day of ['02','03','05','06'])adjustCell(db,'e0',`2026-11-${day}`,{kind:'shift',shiftId:'red-early',locked:true,source:'manual'})
     expect(completedSegments(db,version,db.employees[0]!).find(s=>s.start==='2026-11-02')).toMatchObject({category:'早',days:4})
   })
-  it('批量加班跳过休息、预定休假和请假；休息与休假加班仅通过单格登记',()=>{
+  it('批量加班可覆盖所有状态，撤销仍可恢复计划',()=>{
     const {db,version}=fixture();saveVacationPlan(db,{employeeId:'e0',month:'2026-11',dates:['2026-11-02'],reason:'年假'})
     adjustCell(db,'e1','2026-11-02',{kind:'leave',locked:true,source:'manual'})
     const targets=[{employeeId:'e0',date:'2026-11-02'},{employeeId:'e1',date:'2026-11-02'},{employeeId:'e0',date:'2026-11-01'},{employeeId:'e2',date:'2026-11-02'}]
-    expect(applyScheduleSelection(db,'2026-11',version.id,targets,{type:'adjust',cell:overtime})).toMatchObject({changed:1,skipped:3})
-    expect(version.cells[key('e0','2026-11-02')]?.kind).toBe('vacation')
-    expect(version.cells[key('e0','2026-11-01')]?.kind).toBe('rest')
+    expect(applyScheduleSelection(db,'2026-11',version.id,targets,{type:'adjust',cell:overtime})).toMatchObject({changed:4,skipped:0})
+    expect(version.cells[key('e0','2026-11-02')]?.kind).toBe('overtime')
+    expect(version.cells[key('e0','2026-11-01')]?.kind).toBe('overtime')
     expect(version.cells[key('e2','2026-11-02')]?.kind).toBe('overtime')
     expect(()=>applyScheduleSelection(db,'2026-11',version.id,targets,{type:'lock',locked:false})).toThrow('没有需要更改')
-    expect(()=>adjustCell(db,'e1','2026-11-02',overtime)).toThrow('事后请假')
+    expect(db.vacationPlans[0]!.dates).toEqual(['2026-11-02'])
   })
   it('修改或取消原休假计划不删除加班，撤销加班按最新计划恢复',()=>{
     const {db,version}=fixture(),p=saveVacationPlan(db,{employeeId:'e0',month:'2026-11',dates:['2026-11-02'],reason:'年假'})

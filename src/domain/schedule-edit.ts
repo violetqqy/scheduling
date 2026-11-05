@@ -1,14 +1,12 @@
 import type { Cell, Database, Version } from './types'
 import { daysInMonth, uid, validDate } from './dates'
-import { activeOn, activeVersion, effectiveCell, key } from './model'
-import { adjustCell, overtimeRestoreCell, vacationOn } from './absences'
+import { activeVersion, effectiveCell, key } from './model'
+import { adjustCell, checkCell, overtimeRestoreCell } from './absences'
 
 export interface CellTarget { employeeId: string; date: string }
 export type SelectionAction = { type: 'adjust'; cell: Cell } | { type: 'lock'; locked: boolean }
 
-export function protectedScheduleCell(db: Database, target: CellTarget, cell?: Cell) {
-  return cell?.kind === 'rest' || cell?.kind === 'vacation' || cell?.kind === 'leave' || cell?.kind==='overtime' || !!vacationOn(db,target.employeeId,target.date)
-}
+export function protectedScheduleCell(_db:Database,_target:CellTarget,_cell?:Cell) {return false}
 function checkedVersion(db: Database, month: string, expectedId: string) {
   const version = activeVersion(db,month)
   if (!version || version.id !== expectedId) throw new Error('当前月份或排班版本已变化，请重新选择后操作')
@@ -19,7 +17,7 @@ export function selectionCells(db: Database, version: Version, targets: CellTarg
   if (!unique.length) throw new Error('请先选择排班单元格')
   return unique.map(target => {
     const employee = db.employees.find(e => e.id === target.employeeId)
-    if (!validDate(target.date) || target.date.slice(0,7) !== version.month || !employee || !version.employeeIds.includes(employee.id) || !activeOn(employee,target.date)) throw new Error('选择范围包含非当月或不在任职期内的单元格，请重新选择')
+    if (!validDate(target.date) || target.date.slice(0,7) !== version.month || !employee) throw new Error('选择范围包含非当月日期或未知员工，请重新选择')
     const cell = effectiveCell(db,version,employee,target.date)
     return {target,cell,protected:protectedScheduleCell(db,target,cell)}
   })
@@ -31,12 +29,9 @@ export function selectableScheduleTargets(db: Database, version: Version, target
 
 export function applyScheduleSelection(db: Database, month: string, expectedId: string, targets: CellTarget[], action: SelectionAction) {
   const version = checkedVersion(db,month,expectedId), selected = selectionCells(db,version,targets)
-  if (action.type === 'adjust') {
-    const cell = action.cell
-    if (!['shift','overtime','unassigned','rest','leave'].includes(cell.kind) || cell.kind === 'shift' && !db.shifts.some(s => s.id === cell.shiftId && s.enabled)) throw new Error('请选择有效的班次或状态；预定休假需在工作日历中调整')
-  }
+  if (action.type === 'adjust') checkCell(db,action.cell)
   const eligible = selected.filter(r => !r.protected && (action.type === 'adjust' || r.cell?.kind === 'shift' && r.cell.locked !== action.locked))
-  if (!eligible.length) throw new Error(action.type === 'lock' ? '没有需要更改锁定状态的班次；休息、休假和请假始终受保护' : '所选单元格均受保护，请在工作日历或单格编辑中调整')
+  if (!eligible.length) throw new Error(action.type === 'lock' ? '没有需要更改锁定状态的普通班次' : '没有可调整的单元格')
   for (const {target,cell} of eligible) {
     const next: Cell = action.type === 'lock'
       ? {...cell!,locked:action.locked,source:'manual'}
@@ -50,13 +45,16 @@ export function applyScheduleSelection(db: Database, month: string, expectedId: 
 export function clearMonthSchedule(db: Database, month: string, expectedId: string) {
   const source = checkedVersion(db,month,expectedId)
   const dates = new Set(daysInMonth(month))
-  const assignments = Object.entries(source.cells).filter(([k,c]) => (c.kind === 'shift' || c.kind==='overtime') && dates.has(k.split('|')[1]!))
+  const assignments = Object.entries(source.cells).filter(([k,c]) => (c.kind === 'shift' || c.kind==='overtime' || c.kind==='custom') && dates.has(k.split('|')[1]!))
   if (!assignments.length) throw new Error('本月没有可清空的班次')
   const now = new Date().toISOString()
   const version: Version = {...structuredClone(source),id:uid(),parentId:source.id,name:'清空排班',status:'draft',created:now,updated:now}
   delete version.run
+  delete version.vacationImpacts
+  delete version.manualMixedSegments
+  delete version.segmentBaselines
   for (const [k,cell] of assignments) {
-    if (cell.kind==='overtime') {const [id,date]=k.split('|') as [string,string];version.cells[k]=overtimeRestoreCell(db,id,date,cell)}
+    if (cell.kind==='overtime') {const [id,date]=k.split('|') as [string,string],base=overtimeRestoreCell(db,id,date,cell);if(base.kind==='shift' || base.kind==='custom')delete version.cells[k];else version.cells[k]=base}
     else delete version.cells[k]
   }
   db.versions.push(version); db.activeVersions[month] = version.id

@@ -1,6 +1,6 @@
 import type { Database } from '../domain/types'
 import { validDate } from '../domain/dates'
-import { validOvertimeBase } from '../domain/absences'
+import { checkCell, validOvertimeBase } from '../domain/absences'
 
 let revision: string | undefined
 const databaseName = 'banxu-local-v2'
@@ -47,11 +47,32 @@ export function assertDatabase(value: unknown): asserts value is Database {
     if (!v || typeof v.id !== 'string' || versionIds.has(v.id) || !/^\d{4}-(0[1-9]|1[0-2])$/.test(v.month) || !v.cells || !v.calendar || !v.requirements || !Array.isArray(v.employeeIds) || !v.ruleSettings || !['draft', 'confirmed', 'imported'].includes(v.status)) throw new Error('排班版本结构无效')
     if (v.historyMode && !['initial','reference'].includes(v.historyMode)) throw new Error('版本历史参考模式无效')
     checkPlans(v.vacationPlans,v.month)
+    if(v.segmentBaselines!==undefined){
+      if(!Array.isArray(v.segmentBaselines))throw new Error('原班段达成依据无效')
+      const seen=new Set<string>()
+      for(const b of v.segmentBaselines){
+        const k=`${b.employeeId}:${b.start}`
+        if(!ids.has(b.employeeId) || !shiftIds.has(b.shiftId) || !Array.isArray(b.dates) || !b.dates.length || b.dates.length>62 || b.start!==b.dates[0] || !b.dates.some(d=>d.startsWith(v.month)) || b.dates.some((d,i)=>!validDate(d) || i>0 && d<=b.dates[i-1]!) || b.excludedDates!==undefined && (!Array.isArray(b.excludedDates) || b.excludedDates.some(d=>!b.dates.includes(d)) || new Set(b.excludedDates).size!==b.excludedDates.length) || seen.has(k))throw new Error('原班段达成依据无效')
+        seen.add(k)
+      }
+    }
+    if(v.manualMixedSegments!==undefined && (!Array.isArray(v.manualMixedSegments) || v.manualMixedSegments.some(id=>typeof id!=='string' || !db.employees.some(e=>id.startsWith(`${e.id}:`) && validDate(id.slice(e.id.length+1))))))throw new Error('人工混班段记录无效')
+    if(v.vacationImpacts!==undefined){
+      if(!Array.isArray(v.vacationImpacts))throw new Error('休假递延来源无效')
+      const seen=new Set<string>()
+      for(const record of v.vacationImpacts){
+        const k=`${record.employeeId}|${record.date}`
+        if(!ids.has(record.employeeId) || !validDate(record.date) || !record.date.startsWith(v.month) || seen.has(k) || !db.shifts.some(s=>s.id===record.shiftId && ['中','白','光子'].includes(s.category)) || !Array.isArray(record.segmentDates) || !record.segmentDates.length || record.segmentDates.length>62 || !record.segmentDates.includes(record.date) || record.segmentDates.some((date,i)=>!validDate(date) || i>0 && date<=record.segmentDates[i-1]!))throw new Error('休假递延的原班段来源无效')
+        seen.add(k)
+      }
+    }
     versionIds.add(v.id)
     for (const [k, c] of Object.entries(v.cells)) {
       const [employeeId, date] = k.split('|')
-      if (!ids.has(employeeId!) || !date || !validDate(date) || !date.startsWith(v.month) || !c || !['shift', 'overtime', 'rest', 'vacation', 'leave', 'unassigned'].includes(c.kind) || c.kind === 'shift' && !shiftIds.has(c.shiftId!)) throw new Error('排班明细包含未知员工、日期或班次')
+      if (!ids.has(employeeId!) || !date || !validDate(date) || !date.startsWith(v.month) || !c || !['shift', 'custom', 'overtime', 'rest', 'vacation', 'leave', 'unassigned'].includes(c.kind) || c.kind === 'shift' && !shiftIds.has(c.shiftId!)) throw new Error('排班明细包含未知员工、日期或班次')
+      if(c.kind==='custom' && (typeof c.customName!=='string' || !c.customName.trim() || c.customName.trim().length>30))throw new Error('自定义班次名称无效')
       if (c.kind==='overtime' && (!c.locked || !validOvertimeBase(c.overtimeBase))) throw new Error('加班原状态或保护设置无效')
+      if(c.kind==='overtime')checkCell(db,c.overtimeBase!)
     }
     if (v.employeeIds.some(id => !ids.has(id)) || new Set(v.employeeIds).size !== v.employeeIds.length) throw new Error('版本员工名单无效')
   }

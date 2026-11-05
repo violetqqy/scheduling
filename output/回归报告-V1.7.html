@@ -1,0 +1,2731 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="paper" data-mode="auto" data-style="80">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-TPSDP1AXZvavo2RW073sRDiqqkfEpVu7j99+NJ6828g=' 'sha256-lPqFPx9oza8AmRj6iqQLqEVdDcwxhxzQ3yQnVhy8ZDM='; style-src 'unsafe-inline'; img-src data:; font-src data:; media-src data:; connect-src 'self'; form-action 'none'; base-uri 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="Answer me with HTML 0.5.10">
+<title>班序 V1.7 · 功能回归报告</title>
+<style>
+html[data-theme="blueprint"], html[data-theme="blueprint"][data-mode="light"] {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --radius: 0px;
+  --shadow: none;
+  --bw: 1.5px;
+  --head-font: var(--font-sans);
+  --bg: #f6f6f3;
+  --paper: #ffffff;
+  --ink: #16181d;
+  --ink-2: #4b5260;
+  --ink-3: #8b929e;
+  --line: #1d2026;
+  --line-2: #d6dae1;
+  --fill: #f3f5f8;
+  --accent: #1d5fbf;
+  --accent-bg: #e4ecf8;
+  --ok: #1d5fbf;
+  --ok-bg: #e4ecf8;
+  --err: #c62828;
+  --err-bg: #fbeaea;
+  --warn: #a8620a;
+  --warn-bg: #fdf3e2;
+  --head-bg: #16181d;
+  --head-fg: #ffffff;
+}
+html[data-theme="blueprint"][data-mode="dark"] {
+  --bg: #081322;
+  --paper: #0d1c31;
+  --ink: #e6edf7;
+  --ink-2: #a9b8cc;
+  --ink-3: #6b7f99;
+  --line: #c9d6e8;
+  --line-2: #23385a;
+  --fill: #12253f;
+  --accent: #6ea8ff;
+  --accent-bg: #16305a;
+  --ok: #6ea8ff;
+  --ok-bg: #16305a;
+  --err: #ff7070;
+  --err-bg: #3b1620;
+  --warn: #f0b14a;
+  --warn-bg: #3a2a10;
+  --head-bg: #e6edf7;
+  --head-fg: #081322;
+}
+@media (prefers-color-scheme: dark) {
+html[data-theme="blueprint"][data-mode="auto"] {
+  --bg: #081322;
+  --paper: #0d1c31;
+  --ink: #e6edf7;
+  --ink-2: #a9b8cc;
+  --ink-3: #6b7f99;
+  --line: #c9d6e8;
+  --line-2: #23385a;
+  --fill: #12253f;
+  --accent: #6ea8ff;
+  --accent-bg: #16305a;
+  --ok: #6ea8ff;
+  --ok-bg: #16305a;
+  --err: #ff7070;
+  --err-bg: #3b1620;
+  --warn: #f0b14a;
+  --warn-bg: #3a2a10;
+  --head-bg: #e6edf7;
+  --head-fg: #081322;
+}
+}
+
+html[data-theme="shadcn"], html[data-theme="shadcn"][data-mode="light"] {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --radius: 8px;
+  --shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+  --bw: 1px;
+  --head-font: var(--font-sans);
+  --bg: #fafafa;
+  --paper: #ffffff;
+  --ink: #09090b;
+  --ink-2: #71717a;
+  --ink-3: #a1a1aa;
+  --line: #e4e4e7;
+  --line-2: #f0f0f2;
+  --fill: #f4f4f5;
+  --accent: #2563eb;
+  --accent-bg: #eff6ff;
+  --ok: #16a34a;
+  --ok-bg: #f0fdf4;
+  --err: #dc2626;
+  --err-bg: #fef2f2;
+  --warn: #d97706;
+  --warn-bg: #fffbeb;
+  --head-bg: #18181b;
+  --head-fg: #fafafa;
+}
+html[data-theme="shadcn"][data-mode="dark"] {
+  --bg: #09090b;
+  --paper: #121215;
+  --ink: #fafafa;
+  --ink-2: #a1a1aa;
+  --ink-3: #71717a;
+  --line: #27272a;
+  --line-2: #1c1c1f;
+  --fill: #18181b;
+  --accent: #60a5fa;
+  --accent-bg: #172554;
+  --ok: #4ade80;
+  --ok-bg: #052e16;
+  --err: #f87171;
+  --err-bg: #450a0a;
+  --warn: #fbbf24;
+  --warn-bg: #451a03;
+  --head-bg: #fafafa;
+  --head-fg: #18181b;
+}
+@media (prefers-color-scheme: dark) {
+html[data-theme="shadcn"][data-mode="auto"] {
+  --bg: #09090b;
+  --paper: #121215;
+  --ink: #fafafa;
+  --ink-2: #a1a1aa;
+  --ink-3: #71717a;
+  --line: #27272a;
+  --line-2: #1c1c1f;
+  --fill: #18181b;
+  --accent: #60a5fa;
+  --accent-bg: #172554;
+  --ok: #4ade80;
+  --ok-bg: #052e16;
+  --err: #f87171;
+  --err-bg: #450a0a;
+  --warn: #fbbf24;
+  --warn-bg: #451a03;
+  --head-bg: #fafafa;
+  --head-fg: #18181b;
+}
+}
+
+html[data-theme="paper"], html[data-theme="paper"][data-mode="light"] {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Songti SC", "STSong", "Noto Serif CJK SC", "Source Han Serif SC", serif;
+  --radius: 2px;
+  --shadow: none;
+  --bw: 1px;
+  --head-font: var(--font-serif);
+  --bg: #f5f2ea;
+  --paper: #fdfbf6;
+  --ink: #1f1c17;
+  --ink-2: #57514a;
+  --ink-3: #8c867b;
+  --line: #cbc3b4;
+  --line-2: #e5dfd3;
+  --fill: #f3eee4;
+  --accent: #8c2f1e;
+  --accent-bg: #f5e5df;
+  --ok: #2e6a3b;
+  --ok-bg: #e4efe5;
+  --err: #a3251b;
+  --err-bg: #f7e3e0;
+  --warn: #7f5300;
+  --warn-bg: #f6ecd6;
+  --head-bg: #1f1c17;
+  --head-fg: #fdfbf6;
+}
+html[data-theme="paper"][data-mode="dark"] {
+  --bg: #15130f;
+  --paper: #1c1a15;
+  --ink: #ebe5d8;
+  --ink-2: #b5ad9e;
+  --ink-3: #7b7467;
+  --line: #4a443a;
+  --line-2: #2d2a24;
+  --fill: #242119;
+  --accent: #e59a7d;
+  --accent-bg: #3a2219;
+  --ok: #8cc79a;
+  --ok-bg: #1c3122;
+  --err: #f0928a;
+  --err-bg: #3a1d1a;
+  --warn: #e3b866;
+  --warn-bg: #352a13;
+  --head-bg: #ebe5d8;
+  --head-fg: #15130f;
+}
+@media (prefers-color-scheme: dark) {
+html[data-theme="paper"][data-mode="auto"] {
+  --bg: #15130f;
+  --paper: #1c1a15;
+  --ink: #ebe5d8;
+  --ink-2: #b5ad9e;
+  --ink-3: #7b7467;
+  --line: #4a443a;
+  --line-2: #2d2a24;
+  --fill: #242119;
+  --accent: #e59a7d;
+  --accent-bg: #3a2219;
+  --ok: #8cc79a;
+  --ok-bg: #1c3122;
+  --err: #f0928a;
+  --err-bg: #3a1d1a;
+  --warn: #e3b866;
+  --warn-bg: #352a13;
+  --head-bg: #ebe5d8;
+  --head-fg: #15130f;
+}
+}
+
+html:lang(zh-Hant)[data-theme][data-mode], html:lang(zh-TW)[data-theme][data-mode], html:lang(zh-HK)[data-theme][data-mode], html:lang(zh-MO)[data-theme][data-mode] {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Heiti TC", "Microsoft JhengHei", "Noto Sans CJK TC", "Noto Sans TC", "PingFang SC", "Microsoft YaHei", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+html:lang(ja)[data-theme][data-mode] {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo, "Noto Sans CJK JP", "Noto Sans JP", "PingFang SC", "Microsoft YaHei", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+html:lang(he)[data-theme][data-mode] {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans Hebrew", "Arial Hebrew", Arial, Roboto, "Helvetica Neue", sans-serif;
+}
+
+html {
+  --am-fs-title: calc(24px * var(--am-scale, 1));
+  --am-fs-stat: calc(17px * var(--am-scale, 1));
+  --am-fs-lead: calc(15.5px * var(--am-scale, 1));
+  --am-fs-heading: calc(15px * var(--am-scale, 1));
+  --am-fs-body: calc(14px * var(--am-scale, 1));
+  --am-fs-text: calc(13px * var(--am-scale, 1));
+  --am-fs-code: calc(12.5px * var(--am-scale, 1));
+  --am-fs-small: calc(12px * var(--am-scale, 1));
+  --am-fs-fine: calc(11.5px * var(--am-scale, 1));
+  --am-fs-label: calc(11px * var(--am-scale, 1));
+  --am-fs-tick: calc(10px * var(--am-scale, 1));
+  --am-fs-d-node: 13px;
+  --am-fs-d-field: 12px;
+  --am-fs-d-edge: 11.5px;
+  --am-fs-d-cluster: 11px;
+  --am-fs-d-step: 10px;
+  --am-fs-d-note: 12px;
+  --am-fs-d-badge: 11px;
+  --am-fs-d-chartCat: 12px;
+  --am-fs-d-chartTick: 11px;
+  --am-fs-d-chartVal: 11px;
+  --am-fs-d-chartLegend: 12px;
+  --am-fs-d-totalMin: 10px;
+  --am-fs-d-totalMax: 22px;
+  --am-fs-d-totalFit: 18px;
+  --am-fs-d-totalUnit: 12px;
+  --am-ln-annotPad: calc(14px * var(--am-scale, 1));
+  --am-ln-segLine: calc(16px * var(--am-scale, 1));
+  --am-ln-whenHeight: calc(24px * var(--am-scale, 1));
+  --am-ln-limitsTick: calc(16px * var(--am-scale, 1));
+  --am-ln-treeBadge: calc(15px * var(--am-scale, 1));
+}
+.am-toolbar, .am-lightbox-header {
+  --am-fs-title: 24px;
+  --am-fs-stat: 17px;
+  --am-fs-lead: 15.5px;
+  --am-fs-heading: 15px;
+  --am-fs-body: 14px;
+  --am-fs-text: 13px;
+  --am-fs-code: 12.5px;
+  --am-fs-small: 12px;
+  --am-fs-fine: 11.5px;
+  --am-fs-label: 11px;
+  --am-fs-tick: 10px;
+}
+
+/* Answer me with HTML base — uses theme variables only, never hard-coded colors (theme tokens and decorations: themes/<name>.js). Exception: the var() fallbacks of diagrams (flow / sequence) equal the blueprint light tokens, guarded by a test. */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-sans); font-size: var(--am-fs-body); line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+code, pre, kbd { font-family: var(--font-mono); }
+
+/* ── Toolbar ─────────────────────────────── */
+.am-toolbar {
+  position: fixed; top: 12px; inset-inline-end: 12px; z-index: 10; display: flex; gap: 6px;
+}
+.am-btn {
+  font: var(--am-fs-small)/1 var(--font-sans); color: var(--ink); background: var(--paper);
+  border: 1px solid var(--line-2); border-radius: var(--radius); padding: 7px 10px; cursor: pointer;
+}
+.am-btn:hover { border-color: var(--ink-3); }
+.am-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.am-toolbar .am-btn[aria-disabled="true"] { opacity: .5; cursor: default; }
+.am-toolbar .am-btn[aria-disabled="true"]:hover { border-color: var(--line-2); }
+/* Theme and mode lists: a label and a native select inside one button-like box */
+.am-pick {
+  display: flex; align-items: center; gap: 6px; font: var(--am-fs-small)/1 var(--font-sans); color: var(--ink-2); background: var(--paper);
+  border: 1px solid var(--line-2); border-radius: var(--radius); padding-block: 0; padding-inline: 10px 4px;
+}
+.am-pick:hover { border-color: var(--ink-3); }
+.am-pick:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.am-pick select {
+  font: inherit; color: var(--ink); background: transparent; border: 0; padding: 6px 2px; cursor: pointer; outline: none;
+}
+.am-pick option { color: var(--ink); background: var(--paper); }
+
+/* ── Header ───────────────────────────────── */
+.am-head { margin: 0 0 20px; padding-inline-end: 300px; }
+.am-head h1 { margin: 0; font-size: var(--am-fs-title); line-height: 1.25; letter-spacing: -0.01em; }
+.am-sub { margin: 4px 0 0; color: var(--ink-2); }
+.am-head-meta { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; font-size: var(--am-fs-small); color: var(--ink-2); }
+.am-head-meta b { font-family: var(--font-mono); font-weight: 400; color: var(--ink-3); margin-inline-end: 6px; }
+.am-intro { margin-top: 12px; max-width: 80ch; }
+
+/* ── sheet template ────────────────────────── */
+.am-sheet { max-width: 1680px; margin: 0 auto; padding: 32px 28px 40px; }
+.am-frame { position: relative; }
+.am-grid {
+  display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+  gap: 20px; align-items: start;
+}
+.am-ruler { display: none; }
+.am-ruler span { flex: 1; display: flex; align-items: center; justify-content: center; }
+.am-ruler--top, .am-ruler--bottom { left: 18px; right: 18px; height: 18px; }
+.am-ruler--top { top: 0; }
+.am-ruler--bottom { bottom: 0; }
+.am-ruler--left, .am-ruler--right { top: 18px; bottom: 18px; width: 18px; flex-direction: column; }
+.am-ruler--left { left: 0; }
+.am-ruler--right { right: 0; }
+.am-ruler--top span + span, .am-ruler--bottom span + span { border-inline-start: 1px solid var(--line); }
+.am-ruler--left span + span, .am-ruler--right span + span { border-top: 1px solid var(--line); }
+
+/* ── Panels ───────────────────────────────── */
+.am-panel {
+  background: var(--paper); border: var(--bw) solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--shadow); min-width: 0; overflow: hidden;
+}
+.am-panel-head {
+  display: flex; align-items: stretch; gap: 0; border-bottom: var(--bw) solid var(--line); min-height: 34px;
+}
+.am-panel-id {
+  display: flex; align-items: center; justify-content: center; min-width: 34px; padding: 0 8px;
+  background: var(--head-bg); color: var(--head-fg); font-weight: 600; font-size: var(--am-fs-body);
+}
+.am-panel-head h2 { margin: 0; padding: 7px 12px; font-size: var(--am-fs-heading); font-weight: 600; flex: 1; display: flex; align-items: center; }
+.am-panel-meta { align-self: center; padding: 0 12px; font: var(--am-fs-label)/1.3 var(--font-mono); color: var(--ink-2); text-align: end; }
+.am-panel-body { padding: 14px 16px 16px; }
+.am-panel-body > * + * { margin-top: 12px; }
+
+/* ── Markdown body ───────────────────────── */
+.am-md > :first-child { margin-top: 0; }
+.am-md > :last-child { margin-bottom: 0; }
+.am-md p { margin: 0 0 8px; }
+.am-md ul, .am-md ol { margin: 0 0 8px; padding-inline-start: 20px; }
+.am-md li + li { margin-top: 3px; }
+.am-md h3, .am-md h4 { margin: 14px 0 6px; font-size: var(--am-fs-text); }
+.am-md a { color: var(--accent); }
+.am-md blockquote { margin: 0 0 8px; padding: 2px 12px; border-inline-start: 3px solid var(--line-2); color: var(--ink-2); }
+.am-md :not(pre) > code { font-size: 0.9em; background: var(--fill); padding: 1px 5px; border-radius: 4px; }
+.am-md hr { border: 0; border-top: 1px solid var(--line-2); margin: 12px 0; }
+.am-md table { width: 100%; border-collapse: collapse; font-size: var(--am-fs-text); }
+.am-md th {
+  text-align: start; font: var(--am-fs-label)/1.3 var(--font-mono); color: var(--ink-2); font-weight: 400;
+  padding: 6px 10px; border-bottom: 1px solid var(--line-2);
+}
+/* th { text-align: start } outranks the align attribute from Markdown alignment, so restore right and center columns explicitly. */
+.am-md th[align="right"] { text-align: right; }
+.am-md th[align="center"] { text-align: center; }
+.am-md td { padding: 7px 10px; border-bottom: 1px solid var(--line-2); vertical-align: top; }
+.am-md tbody tr:nth-child(even) td { background: var(--fill); }
+.am-table-wrap { overflow-x: auto; }
+/* Images scale down to the panel and never past 70% of the window height, keeping their shape. */
+.am-md img { max-width: 100%; max-height: 70vh; height: auto; }
+.am-figure { margin: 0; text-align: center; }
+.am-figure img { display: block; margin: 0 auto; border: 1px solid var(--line-2); border-radius: var(--radius); }
+.am-figure figcaption { margin-top: 6px; font-size: var(--am-fs-small); line-height: 1.4; color: var(--ink-2); }
+.am-code {
+  margin: 0; padding: 12px 14px; background: var(--fill); border: 1px solid var(--line-2);
+  border-radius: var(--radius); overflow-x: auto; font-size: var(--am-fs-code); line-height: 1.5;
+}
+/* Ask: a decision the reader makes; the suggested option has a tag and starts unselected like the others */
+.am-ask { margin: 10px 0; padding: 10px 12px 8px; border: 1px solid var(--line-2); border-radius: var(--radius); background: var(--fill); min-width: 0; }
+/* The question floats inside the box, so a long question wraps like text instead of riding on the border */
+.am-ask-q { float: left; width: 100%; padding: 0; margin-bottom: 4px; font-weight: 600; }
+/* Two columns: the control, then the label, tag and note, which wrap under the label and never under the control */
+.am-ask-opt { clear: both; display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 8px; align-items: baseline; padding: 5px 2px; cursor: pointer; }
+.am-ask-opt input { margin: 0; accent-color: var(--accent); position: relative; top: 2px; }
+.am-ask-tag { display: inline-block; font-size: var(--am-fs-label); line-height: 1.5; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 0 6px; white-space: nowrap; }
+.am-ask-note { display: block; color: var(--ink-2); }
+/* Comment box under each panel, and the Reply sheet */
+.am-comment-btn {
+  display: flex; flex-shrink: 0; align-self: center; margin-block: 0; margin-inline: auto 6px; color: var(--ink-3); background: transparent;
+  border: 1px solid transparent; border-radius: var(--radius); padding: 3px; cursor: pointer;
+}
+.am-panel-meta + .am-comment-btn { margin-inline-start: 0; }
+.am-panel:hover .am-comment-btn, .am-comment-btn:focus-visible, .am-comment-btn[aria-expanded="true"] { border-color: var(--line-2); color: var(--ink-2); }
+.am-panel .am-comment-btn.am-comment-btn--on { color: var(--accent); border-color: var(--accent); }
+.am-panel--bare { position: relative; }
+.am-panel--bare > .am-comment-btn { position: absolute; top: 4px; inset-inline-end: 0; }
+.am-comment { padding: 0 14px 12px; }
+.am-comment textarea, .am-reply textarea {
+  width: 100%; font: var(--am-fs-text)/1.5 var(--font-sans); color: var(--ink); background: var(--paper);
+  border: 1px solid var(--line-2); border-radius: var(--radius); padding: 8px 10px; resize: vertical;
+}
+.am-comment textarea:focus-visible, .am-reply textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.am-btn--reply { color: var(--paper); background: var(--ink); border-color: var(--ink); }
+.am-btn--reply:hover { opacity: .88; }
+.am-reply {
+  width: min(640px, calc(100vw - 32px)); padding: 16px; color: var(--ink); background: var(--paper);
+  border: 1px solid var(--line-2); border-radius: var(--radius); box-shadow: 0 12px 40px rgba(0,0,0,.25);
+}
+.am-reply::backdrop { background: rgba(0,0,0,.35); }
+.am-reply-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-bottom: 10px; }
+.am-reply-head span { color: var(--ink-2); font-size: var(--am-fs-text); }
+.am-reply textarea { font-family: var(--font-mono); font-size: var(--am-fs-code); }
+.am-reply-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+.am-reply .am-btn:disabled { opacity: .5; cursor: default; }
+/* The sheet shows the reply drawn (src/runtime/reply-view.js), each line in its own direction; the Markdown that Copy copies sits under a fold. */
+.am-reply-view {
+  max-height: min(60vh, 26em); overflow: auto; padding: 10px 12px; font: var(--am-fs-body)/1.6 var(--font-sans); color: var(--ink);
+  background: var(--paper); border: 1px solid var(--line-2); border-radius: var(--radius); overflow-wrap: anywhere;
+}
+.am-reply-view:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.am-reply-view > div { text-align: start; unicode-bidi: isolate; }
+.am-rv-gap { height: .5em; }
+.am-rv-h1 { font-weight: 700; font-size: var(--am-fs-heading); }
+.am-rv-h2 { font-weight: 700; color: var(--ink-2); margin-top: 2px; }
+.am-rv-tag {
+  display: inline-block; min-width: 1.6em; padding: 0 4px; font-size: var(--am-fs-small); line-height: 1.5; text-align: center;
+  color: var(--ink-2); border: 1px solid var(--line-2); border-radius: var(--radius);
+}
+.am-rv-a { padding-inline-start: 1.6em; }
+.am-rv-a em { color: var(--ink-2); }
+.am-rv-quote { margin-inline-start: 1em; padding-inline-start: 10px; border-inline-start: 3px solid var(--line-2); color: var(--ink-2); white-space: pre-wrap; }
+.am-reply-raw summary { margin-top: 10px; margin-bottom: 6px; font-size: var(--am-fs-small); color: var(--ink-2); cursor: pointer; }
+/* The bar at the bottom of the page: counts and one-click copy, so the reader need not go to the Reply button at the top. */
+.am-reply-bar {
+  position: fixed; inset-block-end: 16px; inset-inline: 0; margin-inline: auto; width: max-content; max-width: calc(100vw - 24px);
+  z-index: 10; display: flex; align-items: center; gap: 10px; padding-block: 8px; padding-inline: 14px 8px; font-size: var(--am-fs-text);
+  color: var(--ink); background: var(--paper); border: 1px solid var(--line-2); border-radius: var(--radius); box-shadow: 0 6px 24px rgba(0,0,0,.18);
+}
+.am-reply-bar[hidden] { display: none; }
+.am-reply-bar-count { color: var(--ink-2); }
+.am-reply-bar .am-btn { flex: none; white-space: nowrap; }
+body.am-has-reply-bar { padding-block-end: 72px; }
+@media (max-width: 480px) {
+  .am-reply-bar { inset-inline: 12px; width: auto; justify-content: space-between; }
+}
+/* Code block: a header (title or path:lines, language, copy), then one span per line; numbered blocks show the line number in a gutter */
+.am-codeblock { margin: 10px 0; min-width: 0; }
+.am-codeblock .am-code { border-top-left-radius: 0; border-top-right-radius: 0; padding: 10px 0; }
+.am-code-head {
+  display: flex; align-items: center; gap: 8px; padding: 5px 6px 5px 12px; font: var(--am-fs-small)/1.3 var(--font-sans); color: var(--ink-2);
+  background: var(--paper); border: 1px solid var(--line-2); border-bottom: 0; border-radius: var(--radius) var(--radius) 0 0;
+}
+.am-code-title { font-family: var(--font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.am-code-lang { margin-left: auto; color: var(--ink-3); text-transform: lowercase; }
+.am-code-copy { font: var(--am-fs-small)/1 var(--font-sans); color: var(--ink-2); background: transparent; border: 1px solid var(--line-2); border-radius: var(--radius); padding: 4px 8px; cursor: pointer; margin-left: auto; }
+.am-code-lang + .am-code-copy { margin-left: 0; }
+.am-code-copy:hover { border-color: var(--ink-3); color: var(--ink); }
+.am-code-copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.am-code code { display: block; min-width: max-content; }
+.am-ln { display: block; padding: 0 14px; min-height: 1.5em; white-space: pre; }
+.am-ln--hl { background: var(--accent-bg); box-shadow: inset 3px 0 0 var(--accent); }
+.am-code--num .am-ln::before {
+  content: attr(data-n); display: inline-block; width: 3.5ch; margin-right: 12px; text-align: right; color: var(--ink-3);
+  user-select: none; -webkit-user-select: none;
+}
+
+/* ── Status badges ok / no / warn ──────────────── */
+.am-status { white-space: nowrap; font-weight: 500; }
+.am-status--ok { color: var(--ok); }
+.am-status--no { color: var(--err); }
+.am-status--warn { color: var(--warn); }
+.am-status-icon { display: inline-block; width: 1.1em; font-weight: 700; }
+
+/* ── callout ─────────────────────────────── */
+.am-callout {
+  border: 1px solid var(--line-2); border-inline-start: 3px solid var(--accent); background: var(--accent-bg);
+  padding: 10px 14px; border-radius: var(--radius);
+}
+.am-callout--ok { border-inline-start-color: var(--ok); background: var(--ok-bg); }
+.am-callout--warn { border-inline-start-color: var(--warn); background: var(--warn-bg); }
+.am-callout--err { border-inline-start-color: var(--err); background: var(--err-bg); }
+.am-callout-title { font-weight: 600; margin-bottom: 4px; }
+
+/* ── kv title block ─────────────────────────── */
+.am-kv {
+  display: grid; grid-template-columns: repeat(var(--kv-cols, 2), minmax(0, 1fr)); margin: 0;
+  border-top: var(--bw) solid var(--line); border-inline-start: var(--bw) solid var(--line);
+}
+.am-kv-cell { border-inline-end: var(--bw) solid var(--line); border-bottom: var(--bw) solid var(--line); padding: 6px 10px 8px; min-width: 0; }
+.am-kv-cell--wide { grid-column: 1 / -1; }
+.am-kv dt { font: var(--am-fs-label)/1.4 var(--font-mono); color: var(--ink-2); }
+.am-kv dd { margin: 2px 0 0; font-size: var(--am-fs-body); font-weight: 500; overflow-wrap: anywhere; }
+.am-kv-cell--wide dd { font-size: var(--am-fs-stat); font-weight: 600; }
+
+/* ── timeline ────────────────────────────── */
+.am-timeline { list-style: none; margin: 0; padding: 0; }
+.am-timeline--h { display: grid; grid-template-columns: repeat(var(--n, 1), minmax(0, 1fr)); padding-top: 4px; }
+.am-timeline--h li { position: relative; text-align: center; padding: 0 6px; }
+.am-timeline--h li::before {
+  content: ""; position: absolute; top: calc(var(--am-ln-whenHeight) + 7px); left: 0; right: 0; border-top: var(--bw) solid var(--line);
+}
+.am-timeline--h li:first-child::before { inset-inline-start: 50%; }
+.am-timeline--h li:last-child::before { inset-inline-end: 50%; }
+.am-tl-when { display: block; font-size: var(--am-fs-heading); font-weight: 500; height: var(--am-ln-whenHeight); }
+.am-tl-dot {
+  position: relative; display: block; width: 11px; height: 11px; margin: 2px auto 8px;
+  border: var(--bw) solid var(--line); border-radius: 50%; background: var(--paper);
+}
+.am-tl-item--hi .am-tl-dot { background: var(--hi-stroke, var(--accent)); border-color: var(--hi-stroke, var(--accent)); }
+.am-tl-title { display: block; font-size: var(--am-fs-code); font-weight: 500; }
+.am-tl-text { display: block; font-size: var(--am-fs-small); color: var(--ink-2); line-height: 1.45; }
+.am-timeline--v li { position: relative; padding: 0 0 14px; padding-inline-start: 22px; }
+.am-timeline--v li::before { content: ""; position: absolute; inset-inline-start: 5px; top: 6px; bottom: -6px; border-inline-start: var(--bw) solid var(--line-2); }
+.am-timeline--v li:last-child::before { display: none; }
+.am-timeline--v .am-tl-dot { position: absolute; inset-inline-start: 0; top: 4px; margin: 0; }
+.am-timeline--v .am-tl-when { display: inline; height: auto; font: var(--am-fs-small) var(--font-mono); color: var(--ink-2); margin-inline-end: 8px; }
+.am-timeline--v .am-tl-title { display: inline; font-size: var(--am-fs-body); }
+.am-timeline--v .am-tl-text { margin-top: 2px; }
+/* .am-tl-wrap is the container (src/components/timeline.js): a horizontal timeline answers to the width it has, not to the width of the window, since a
+   sheet puts panels two or three to a row. Below 560 px (about 90 px for each of the six items a timeline has by default) its dates
+   wrap and the dots cover them, so it lays out like timeline v: line and dots at the start, text beside them. */
+.am-tl-wrap { container-type: inline-size; }
+@container (max-width: 560px) {
+  .am-timeline--h { display: block; padding-top: 0; }
+  .am-timeline--h li { text-align: start; padding: 0 0 14px; padding-inline-start: 22px; }
+  .am-timeline--h li::before, .am-timeline--h li:first-child::before {
+    top: 6px; bottom: -6px; inset-inline-start: 5px; inset-inline-end: auto; border-top: 0; border-inline-start: var(--bw) solid var(--line-2);
+  }
+  .am-timeline--h li:last-child::before { display: none; }
+  .am-timeline--h .am-tl-dot { position: absolute; inset-inline-start: 0; top: 4px; margin: 0; }
+  .am-timeline--h .am-tl-when { display: inline; height: auto; font: var(--am-fs-small) var(--font-mono); color: var(--ink-2); margin-inline-end: 8px; }
+  .am-timeline--h .am-tl-title { display: inline; font-size: var(--am-fs-body); }
+  .am-timeline--h .am-tl-text { margin-top: 2px; }
+}
+
+/* ── annot sentence notes ──────────────────────── */
+.am-annot + .am-annot { border-top: 1px solid var(--line-2); padding-top: 12px; }
+.am-annot-head { display: flex; justify-content: space-between; gap: 12px; font-size: var(--am-fs-text); font-weight: 600; margin-bottom: 8px; }
+.am-annot-meta { font: var(--am-fs-label) var(--font-mono); font-weight: 400; color: var(--ink-2); }
+.am-annot-scroll { overflow-x: auto; }
+.am-annot-line {
+  position: relative; display: inline-block; white-space: pre; font: var(--am-fs-body)/1.6 var(--font-mono);
+  padding-bottom: calc(var(--rows, 0) * (var(--am-ln-segLine) + 1px) + var(--am-ln-annotPad));
+}
+.am-annot-line--wrap { display: block; white-space: normal; padding-bottom: 10px; }
+.am-annot-line--wrap .am-seg { white-space: nowrap; }
+.am-seg { position: relative; }
+.am-seg::after {
+  content: ""; position: absolute; left: 1px; right: 1px; top: calc(100% + 1px); height: 5px;
+  border: 1px solid var(--accent); border-top: 0;
+}
+.am-seg-n {
+  position: absolute; inset-inline-start: 0; top: calc(100% + 8px + var(--row, 0) * (var(--am-ln-segLine) + 1px));
+  font: var(--am-fs-label)/var(--am-ln-segLine) var(--font-sans); color: var(--accent); white-space: nowrap;
+}
+.am-seg--err { color: var(--err); }
+.am-seg--err::after { border-color: var(--err); }
+.am-seg--err .am-seg-n { color: var(--err); }
+.am-annot-caption { font-size: var(--am-fs-small); color: var(--ink-2); }
+
+/* ── limits bars ───────────────────────── */
+.am-lim + .am-lim { margin-top: 14px; }
+.am-lim-head { display: flex; justify-content: space-between; gap: 12px; font-size: var(--am-fs-text); margin-bottom: 4px; }
+.am-lim-val { font: var(--am-fs-small) var(--font-mono); color: var(--accent); white-space: nowrap; }
+.am-lim-track { position: relative; height: 12px; border: 1px solid var(--line-2); background: var(--fill); border-radius: calc(var(--radius) / 2); }
+.am-lim-fill { position: absolute; inset-inline-start: 0; top: 0; bottom: 0; background: var(--accent-bg); border-inline-end: 1px solid var(--accent); }
+.am-lim-mark { position: absolute; top: -4px; bottom: -4px; border-left: 2px solid var(--accent); }
+.am-lim.is-over .am-lim-fill { background: var(--err-bg); border-inline-end-color: var(--err); }
+.am-lim.is-over .am-lim-val { color: var(--err); }
+.am-lim-ticks { position: relative; height: var(--am-ln-limitsTick); font: var(--am-fs-tick)/var(--am-ln-limitsTick) var(--font-mono); color: var(--ink-3); }
+.am-lim-ticks span { position: absolute; transform: translateX(-50%); }
+.am-lim-ticks span:first-child { transform: none; }
+.am-lim-note { font-size: var(--am-fs-label); color: var(--ink-2); margin-inline-start: 6px; }
+
+/* ── tree ─────────────────────────── */
+.am-tree { font-size: var(--am-fs-text); }
+.am-tree-root { display: flex; justify-content: center; position: relative; padding-bottom: 18px; }
+.am-tree-root::after { content: ""; position: absolute; bottom: 0; left: 50%; height: 18px; border-left: var(--bw) solid var(--line); }
+.am-tree-root--solo { padding-bottom: 12px; }
+.am-tree-root--solo::after { display: none; }
+.am-tree-box {
+  border: var(--node-width, var(--bw)) solid var(--node-stroke, var(--line)); background: var(--node-fill, var(--paper)); padding: 6px 14px; text-align: center;
+  border-radius: var(--node-radius, var(--radius)); font-weight: 600; color: var(--node-text, inherit); filter: var(--node-shadow, none);
+}
+.am-tree-box small { display: block; font-weight: 400; color: var(--ink-2); font-size: var(--am-fs-small); }
+/* The root box and a highlighted box are emphasis: they take the highlight tokens. With none set the root box keeps its accent tint and a highlighted box looks like any other. */
+.am-tree-box--root, .am-tree-box--hi { border-color: var(--hi-stroke, var(--node-stroke, var(--line))); color: var(--hi-text, var(--node-text, inherit)); }
+.am-tree-box--root { background: var(--hi-fill, var(--accent-bg)); }
+.am-tree-box--hi { background: var(--hi-fill, var(--node-fill, var(--paper))); }
+.am-tree-box--root small, .am-tree-box--hi small { color: var(--hi-text, var(--ink-2)); }
+.am-tree-box--root { font-size: var(--am-fs-heading); padding: 8px 28px; }
+.am-tree-cols { display: grid; grid-template-columns: repeat(var(--n, 1), minmax(0, 1fr)); }
+.am-tree-col { position: relative; padding: 18px 8px 0; min-width: 0; }
+.am-tree-col::before { content: ""; position: absolute; top: 0; left: 0; right: 0; border-top: var(--bw) solid var(--line); }
+.am-tree-col:first-child::before { inset-inline-start: 50%; }
+.am-tree-col:last-child::before { inset-inline-end: 50%; }
+.am-tree-col::after { content: ""; position: absolute; top: 0; left: 50%; height: 18px; border-left: var(--bw) solid var(--line); }
+.am-tree-list, .am-tree-list ul { list-style: none; margin: 0; padding: 0; }
+.am-tree-col > .am-tree-list { margin: 8px 0 0; margin-inline-start: 14px; }
+.am-tree-list ul { margin-inline-start: 16px; }
+.am-tree-list li { position: relative; padding: 3px 0; padding-inline-start: 18px; }
+.am-tree-list li::before { content: ""; position: absolute; inset-inline-start: 0; top: 0.95em; width: 12px; border-top: 1px solid var(--ink-3); }
+.am-tree-list li::after { content: ""; position: absolute; inset-inline-start: 0; top: 0; bottom: 0; border-inline-start: 1px solid var(--ink-3); }
+.am-tree-list li:last-child::after { bottom: auto; height: 0.95em; }
+.am-tree-tag { font: var(--am-fs-label) var(--font-mono); color: var(--ink-3); margin-inline-end: 4px; }
+.am-tree code { font: var(--am-fs-small) var(--font-mono); }
+.am-tree-sub { display: block; font-size: var(--am-fs-fine); color: var(--ink-2); }
+.am-tree-hi > .am-tree-label { color: var(--accent); font-weight: 600; }
+
+/* ── Diagrams (flow / sequence) ───────────────── */
+.am-diagram { margin: 0; overflow-x: auto; text-align: center; }
+/* Embedded previews can lose html[data-theme]; the fallbacks keep diagrams readable, and defined theme variables still win. */
+.am-diagram svg { max-width: 100%; height: auto; font-family: var(--font-sans, sans-serif); }
+.am-diagram text { fill: var(--ink, #16181d); font-size: var(--am-fs-d-node); }
+/* Diagram tokens (docs/reference.md, "Diagram tokens"): each painted part reads an optional token and falls back to the look it always had,
+   so a theme that sets none of them draws the same diagram. Font family, size and weight are not tokens: diagram text is measured for the sans font. */
+.am-node-shape { fill: var(--node-fill, var(--paper, #ffffff)); stroke: var(--node-stroke, var(--line, #1d2026)); stroke-width: var(--node-width, var(--bw, 1.5px)); filter: var(--node-shadow, none); }
+/* A cylinder is two shapes (body, then cap): only the body casts the shadow. */
+.am-node-shape ~ .am-node-shape { filter: none; }
+/* The corner radius is an SVG attribute (the fallback for Safari before 17.4, which ignores a CSS rx); the default here equals the attribute. A pill and a diamond keep their shape. */
+.am-node--rect .am-node-shape, .am-node--er .am-node-shape { rx: var(--node-radius, 3px); }
+.am-node--hi .am-node-shape { fill: var(--hi-fill, var(--accent-bg, #e4ecf8)); stroke: var(--hi-stroke, var(--accent, #1d5fbf)); }
+.am-diagram .am-node-text { fill: var(--node-text, var(--ink, #16181d)); }
+.am-node--hi text { fill: var(--hi-text, var(--accent, #1d5fbf)); font-weight: 600; }
+.am-diagram .am-node--hi .am-node-text { fill: var(--hi-text, var(--accent, #1d5fbf)); }
+.am-edge { fill: none; stroke: var(--edge-color, var(--ink-2, #4b5260)); stroke-width: var(--edge-width, 1.3); }
+.am-edge--dashed { stroke-dasharray: 5 4; }
+.am-arrow { fill: var(--edge-color, var(--ink-2, #4b5260)); }
+.am-edge-label rect { fill: var(--paper, #ffffff); }
+.am-diagram .am-edge-label text { fill: var(--edge-label, var(--accent, #1d5fbf)); font-size: var(--am-fs-d-edge); }
+.am-cluster { fill: var(--cluster-fill, var(--fill, #f3f5f8)); stroke: var(--cluster-stroke, var(--line-2, #d6dae1)); stroke-width: 1; stroke-dasharray: 4 3; }
+.am-diagram .am-cluster-label { fill: var(--ink-2, #4b5260); font: var(--am-fs-d-cluster) var(--font-mono, monospace); }
+/* The PK / FK / UK marks of an entity follow the node text, and the highlighted text in a highlighted entity, so they stay readable on the theme's fills. */
+.am-diagram .am-er-key { fill: var(--node-text, var(--ink-2, #4b5260)); }
+.am-diagram .am-node--hi .am-er-key { fill: var(--hi-text, var(--ink-2, #4b5260)); }
+.am-lifeline { stroke: var(--lifeline-color, var(--ink-3, #8b929e)); stroke-width: 1; stroke-dasharray: 4 4; }
+/* An actor (and the box of a divider) looks like a node unless the theme sets the actor tokens. */
+.am-actor { fill: var(--actor-fill, var(--node-fill, var(--paper, #ffffff))); stroke: var(--actor-stroke, var(--node-stroke, var(--line, #1d2026))); stroke-width: var(--node-width, var(--bw, 1.5px)); filter: var(--node-shadow, none); rx: var(--node-radius, 2px); }
+.am-diagram .am-actor-text { fill: var(--actor-text, var(--node-text, var(--ink, #16181d))); }
+.am-note { fill: var(--note-fill, var(--warn-bg, #fdf3e2)); stroke: var(--note-stroke, var(--warn, #a8620a)); stroke-width: var(--note-width, 1); rx: var(--note-radius, 2px); }
+.am-diagram .am-step { fill: var(--ink-3, #8b929e); font: var(--am-fs-d-step) var(--font-mono, monospace); }
+
+.am-diagram-expand {
+  /* In flow and sticky: it sits at the end edge (right on a left-to-right page) and stays in view when the diagram scrolls sideways.
+     It takes its own row above the drawing, so it never covers a node at the top-right corner of the drawing. */
+  position: sticky; inset-inline-start: calc(100% - 36px); z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; padding: 0; margin: 0 0 4px; margin-inline: auto 8px;
+  color: var(--ink-2); background: var(--paper);
+  border: var(--bw, 1px) solid var(--line-2); border-radius: var(--radius);
+  cursor: pointer; opacity: 0.72;
+  transition: opacity 0.15s, color 0.15s, border-color 0.15s, background 0.15s;
+}
+.am-diagram:hover .am-diagram-expand,
+.am-diagram-expand:focus-visible { opacity: 1; }
+.am-diagram-expand:hover {
+  opacity: 1; color: var(--ink); border-color: var(--accent); background: var(--fill);
+}
+.am-diagram-expand:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* ── Diagram Lightbox and Pan-Zoom Viewer ─────────── */
+.am-lightbox {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; flex-direction: column;
+  touch-action: none;
+}
+.am-lightbox[hidden] { display: none !important; }
+
+.am-lightbox-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.am-lightbox-header {
+  position: absolute; top: 12px; left: 24px; right: 24px; height: 36px;
+  display: flex; align-items: center; justify-content: space-between;
+  z-index: 10; pointer-events: none;
+}
+.am-lightbox-title {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: rgba(255, 255, 255, 0.92);
+  font: var(--am-fs-text)/1 var(--font-sans, sans-serif); font-weight: 500;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  pointer-events: auto;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60vw;
+}
+.am-lightbox-title svg { stroke: rgba(255, 255, 255, 0.85); flex-shrink: 0; }
+.am-lightbox-actions {
+  display: flex; align-items: center; gap: 8px; pointer-events: auto;
+}
+.am-lightbox-close {
+  width: 32px; height: 32px;
+  background: var(--paper);
+  border: var(--bw, 1px) solid var(--line-2);
+  border-radius: 50%;
+  color: var(--ink);
+  font-size: var(--am-fs-heading); line-height: 1;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: background 0.15s, color 0.15s, transform 0.15s, border-color 0.15s;
+}
+.am-lightbox-close:hover {
+  color: var(--accent); border-color: var(--accent); background: var(--fill); transform: scale(1.05);
+}
+.am-lightbox-close:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.am-lightbox-stage {
+  position: absolute;
+  top: 54px; bottom: 20px; left: 24px; right: 24px;
+  background: var(--paper);
+  border: var(--bw, 1px) solid var(--line-2);
+  border-radius: max(var(--radius), 14px);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.am-lightbox-stage.am-panning { cursor: grabbing; }
+
+.am-lightbox-canvas {
+  position: absolute; left: 0; top: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+  pointer-events: none;
+}
+.am-lightbox-canvas svg {
+  max-width: none !important;
+  max-height: none !important;
+  display: block;
+  font-family: var(--font-sans, sans-serif);
+}
+
+/* ── doc template ────────────────────────── */
+.am-doc { max-width: 916px; margin: 0 auto; padding: 40px 28px 64px; }
+.am-doc-layout { position: relative; }
+/* The outline rail: a zero-height sticky strip whose child hangs 8px outside the body on the chosen side. "start" and "end" are
+   logical, so the rail mirrors on a right-to-left page. data-flow says which way the label and the list open: "out" away from the
+   body, "in" over it (src/runtime/outline.js picks it from the room left in the viewport; the markup starts with "in"). */
+/* Above panels and the diagram expand button (2), below the fixed toolbar and reply bar (10). */
+.am-toc { position: sticky; top: 72px; height: 0; z-index: 5; font-size: var(--am-fs-text); }
+.am-outline { position: absolute; top: 0; inset-inline-start: calc(100% + 8px); }
+.am-toc[data-side="start"] .am-outline { inset-inline-start: auto; inset-inline-end: calc(100% + 8px); }
+.am-outline > summary { display: block; width: 16px; list-style: none; cursor: pointer; border-radius: 4px; }
+.am-outline > summary::-webkit-details-marker { display: none; }
+.am-outline > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.am-ticks { display: flex; flex-direction: column; max-height: calc(100vh - 100px); }
+.am-tick { position: relative; display: block; font-style: normal; flex: 0 1 9px; min-height: 2px; }
+.am-tick::before { content: ""; position: absolute; inset-inline: 3px; top: 50%; height: 2px; margin-top: -1px; border-radius: 1px; background: var(--ink-3); opacity: .55; }
+.am-tick:hover::before, .am-tick.is-peek::before { background: var(--ink); opacity: 1; }
+.am-tick.is-current::before { inset-inline: 0; height: 3px; margin-top: -1.5px; background: var(--accent); opacity: 1; }
+.am-tick::after {
+  content: attr(data-title); display: none; position: absolute; top: 50%; transform: translateY(-50%); z-index: 1; pointer-events: none;
+  max-width: min(240px, calc(100vw - 48px)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  padding: 3px 8px; font-size: var(--am-fs-small); color: var(--ink); background: var(--paper); border: 1px solid var(--line-2); border-radius: var(--radius); box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
+}
+.am-tick:hover::after, .am-tick.is-peek::after { display: block; }
+.am-outline[open] .am-tick::after { display: none; }
+.am-outline-list {
+  position: absolute; top: -6px; z-index: 2; margin: 0; padding: 6px; list-style: none;
+  width: min(240px, calc(100vw - 48px)); max-height: calc(100vh - 96px); overflow-y: auto;
+  background: var(--paper); border: 1px solid var(--line-2); border-radius: var(--radius); box-shadow: 0 6px 24px rgba(0, 0, 0, .14);
+}
+.am-outline-list a { display: block; padding: 5px 8px; color: var(--ink-2); text-decoration: none; border-radius: 4px; border-inline-start: 2px solid transparent; }
+.am-outline-list a:hover { color: var(--ink); background: var(--line-2); }
+.am-outline-list a[aria-current="true"] { color: var(--ink); font-weight: 600; border-inline-start-color: var(--accent); }
+.am-outline-list a:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+/* Opens toward inline-end: end rail flowing out, start rail flowing in. Otherwise toward inline-start. */
+.am-toc[data-side="end"][data-flow="out"] .am-tick::after, .am-toc[data-side="start"][data-flow="in"] .am-tick::after,
+.am-toc[data-side="end"][data-flow="out"] .am-outline-list, .am-toc[data-side="start"][data-flow="in"] .am-outline-list { inset-inline-start: calc(100% + 6px); }
+.am-toc[data-side="start"][data-flow="out"] .am-tick::after, .am-toc[data-side="end"][data-flow="in"] .am-tick::after,
+.am-toc[data-side="start"][data-flow="out"] .am-outline-list, .am-toc[data-side="end"][data-flow="in"] .am-outline-list { inset-inline-end: calc(100% + 6px); }
+@media (prefers-reduced-motion: no-preference) {
+  .am-outline[open] .am-outline-list { animation: am-outline-in .14s ease-out; }
+  .am-tick::before { transition: inset-inline .12s, height .12s, opacity .12s; }
+}
+@keyframes am-outline-in { from { opacity: 0; } to { opacity: 1; } }
+.am-doc-body > .am-panel + .am-panel { margin-top: 20px; }
+
+/* ── Responsive and print ─────────────────────────── */
+@media (max-width: 1100px) {
+  .am-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .am-grid > .am-panel { grid-column: auto !important; }
+  .am-grid > .am-panel.am-span-wide { grid-column: 1 / -1 !important; }
+}
+@media (max-width: 760px) {
+  .am-sheet, .am-doc { padding: 56px 12px 24px; }
+  /* The toolbar holds more controls than a phone fits on one row. It scrolls sideways in place, so Theme and Mode stay reachable
+     and the page keeps the 56px top padding for one row. The rings focus draws outside a button are clipped by that scroll box. */
+  .am-toolbar { max-width: calc(100vw - 24px); overflow-x: auto; scrollbar-width: none; }
+  .am-toolbar::-webkit-scrollbar { display: none; }
+  .am-toolbar > * { flex: none; }
+  .am-toolbar .am-btn:focus-visible, .am-toolbar .am-pick:focus-within { outline-offset: -2px; }
+  .am-head { padding-inline-end: 0; }
+  .am-grid { grid-template-columns: minmax(0, 1fr); }
+  .am-grid > .am-panel.am-span-wide { grid-column: auto !important; }
+  /* The rail hugs the viewport edge inside a strip of its own, so it never covers text and never pushes the body down. */
+  .am-doc-layout--rail-end { padding-inline-end: 18px; }
+  .am-doc-layout--rail-start { padding-inline-start: 18px; }
+  .am-toc[data-side="end"] .am-outline { inset-inline-start: auto; inset-inline-end: -17px; }
+  .am-toc[data-side="start"] .am-outline { inset-inline-end: auto; inset-inline-start: -17px; }
+  .am-tree-cols { grid-template-columns: minmax(0, 1fr); }
+  /* Tables and diagrams keep their size: the wrapper scrolls horizontally when they overflow. A cell is never narrower than about
+     two short words, so a phone does not stack them one per line. On wider screens the sheet layout (src/runtime/layout-dom.js)
+     gives a table panel the width its columns read well at. */
+  .am-md th, .am-md td { min-width: 8em; }
+  .am-diagram svg { max-width: none; }
+  .am-lightbox-header { top: 8px; left: 12px; right: 12px; }
+  .am-lightbox-stage { top: 46px; bottom: 12px; left: 12px; right: 12px; border-radius: max(var(--radius), 10px); }
+}
+.am-colophon { margin: 0 0 8px; font: var(--am-fs-label) var(--font-mono); color: var(--ink-3); }
+.am-colophon a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
+@media print {
+  .am-toolbar, .am-diagram-expand, .am-lightbox, .am-code-copy, .am-toc, .am-comment-btn, .am-comment, .am-reply, .am-reply-bar { display: none !important; }
+  body { background: var(--paper); }
+  .am-panel { break-inside: avoid; box-shadow: none; }
+}
+/* Printed on paper narrower than three columns, the two-column grid left a hole beside every panel next to a full-width one
+   (a wide table, a wide diagram): one panel per row instead. */
+@media print and (max-width: 1100px) {
+  .am-grid { grid-template-columns: minmax(0, 1fr); }
+  .am-grid > .am-panel { grid-column: auto !important; }
+}
+.am-panel--bare { border: 0; background: transparent; box-shadow: none; }
+.am-panel--bare > .am-panel-body { padding: 0; }
+.am-panel--bare .am-kv { background: var(--paper); }
+
+/* Remark mode: block marks with a note, collected into the Reply copy (src/runtime/remark.js). Each kind borrows a status colour of
+   the theme, so a mark reads in light and dark mode on every theme. */
+.am-btn--remark.is-on { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.am-btn--remark-clear { color: var(--err); }
+.am-btn--remark-clear.is-armed { background: var(--err-bg); border-color: var(--err); }
+.am-remark-hover { outline: 1px dashed var(--ink-3); outline-offset: 2px; cursor: pointer; }
+[data-am-pick]:focus { outline: none; }
+[data-am-pick]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+:is(.am-mark, .am-remark-kind)[data-kind="suggestion"] { --mark: var(--warn); --mark-bg: var(--warn-bg); }
+:is(.am-mark, .am-remark-kind)[data-kind="keep"] { --mark: var(--ok); --mark-bg: var(--ok-bg); }
+:is(.am-mark, .am-remark-kind)[data-kind="question"] { --mark: var(--accent); --mark-bg: var(--accent-bg); }
+:is(.am-mark, .am-remark-kind)[data-kind="concern"] { --mark: var(--err); --mark-bg: var(--err-bg); }
+.am-mark { border-inline-start: 3px solid var(--mark); padding-inline-start: 10px; background: var(--mark-bg); border-radius: 1px; }
+/* The note chip sits inside the marked block (a table takes it as its caption, a list item puts it before its sub-list), so lists and
+   grids keep their children. */
+.am-mark-note {
+  display: block; margin-block-start: 4px; font: var(--am-fs-small)/1.5 var(--font-sans); letter-spacing: normal; text-transform: none;
+  color: var(--ink-2); white-space: pre-wrap; caption-side: bottom; text-align: start;
+}
+.am-mark-note b { color: var(--ink); font-weight: 600; }
+caption.am-mark-note { display: table-caption; }
+/* Table rows have their own backgrounds, so a tint on the table would show on every other row only: the bar marks a table. */
+table.am-mark { background: none; }
+.am-remark-pop {
+  position: absolute; z-index: 40; width: min(264px, calc(100vw - 16px)); padding: 8px; display: grid; gap: 6px;
+  color: var(--ink); background: var(--paper); border: 1px solid var(--line-2); border-radius: var(--radius); box-shadow: 0 6px 24px rgba(0, 0, 0, .14);
+}
+.am-remark-pop[hidden] { display: none; }
+.am-remark-kinds { display: flex; gap: 6px; flex-wrap: wrap; }
+.am-remark-kind { font: var(--am-fs-small)/1 var(--font-sans); color: var(--ink-2); background: var(--paper); border: 1px solid var(--line-2); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+.am-remark-kind:hover { border-color: var(--ink-3); }
+.am-remark-kind[aria-pressed="true"] { color: var(--ink); border-color: var(--mark); background: var(--mark-bg); }
+.am-remark-kind:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.am-remark-pop textarea { font: var(--am-fs-text)/1.5 var(--font-sans); color: var(--ink); background: var(--paper); border: 1px solid var(--line-2); border-radius: var(--radius); padding: 6px 8px; resize: vertical; }
+.am-remark-actions { display: flex; gap: 6px; }
+.am-remark-actions .am-btn:disabled { opacity: .5; cursor: default; }
+.am-remark-need { align-self: center; color: var(--ink-3); font-size: var(--am-fs-small); }
+.am-remark-kind::before { content: attr(data-n); margin-inline-end: 5px; color: var(--ink-3); font-family: var(--font-mono); font-size: var(--am-fs-label); }
+@media print { .am-remark-pop { display: none !important; } }
+
+
+html[data-theme="blueprint"] .am-frame { border: 1px solid var(--line); padding: 30px; }
+html[data-theme="blueprint"] .am-frame::before {
+  content: ""; position: absolute; inset: 18px; border: 1px solid var(--line); pointer-events: none;
+}
+html[data-theme="blueprint"] .am-ruler {
+  display: flex; position: absolute; font: var(--am-fs-tick)/1 var(--font-mono); color: var(--ink-3);
+}
+@media (max-width: 760px) {
+  html[data-theme="blueprint"] .am-frame { padding: 0; border: 0; }
+  html[data-theme="blueprint"] .am-frame::before, html[data-theme="blueprint"] .am-ruler { display: none; }
+}
+
+html[data-theme="shadcn"] .am-panel-id { border-radius: 6px; min-width: 24px; height: 24px; margin: 9px 0 9px 14px; font-size: var(--am-fs-small); }
+html[data-theme="shadcn"] .am-panel-head { border-bottom-width: 1px; }
+html[data-theme="shadcn"] .am-kv { border-color: var(--line); border-radius: var(--radius); overflow: hidden; }
+
+html[data-theme="paper"]:lang(zh-Hant)[data-mode], html[data-theme="paper"]:lang(zh-TW)[data-mode], html[data-theme="paper"]:lang(zh-HK)[data-mode], html[data-theme="paper"]:lang(zh-MO)[data-mode] { --font-serif: "Iowan Old Style", Palatino, Georgia, "Songti TC", "PMingLiU", "MingLiU", "Noto Serif CJK TC", "Noto Serif TC", "Source Han Serif TC", "Songti SC", serif; }
+html[data-theme="paper"]:lang(ja)[data-mode] { --font-serif: "Iowan Old Style", Palatino, Georgia, "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif CJK JP", "Noto Serif JP", "Songti SC", serif; }
+html[data-theme="paper"]:lang(he)[data-mode] { --font-serif: "Iowan Old Style", Palatino, Georgia, "Noto Serif Hebrew", "Frank Ruehl CLM", David, "Times New Roman", serif; }
+html[data-theme="paper"] .am-head h1, html[data-theme="paper"] .am-panel-head h2, html[data-theme="paper"] .am-md, html[data-theme="paper"] .am-intro, html[data-theme="paper"] .am-callout { font-family: var(--font-serif); }
+html[data-theme="paper"] .am-head h1 { font-weight: 600; letter-spacing: 0; }
+html[data-theme="paper"] .am-md p, html[data-theme="paper"] .am-md li, html[data-theme="paper"] .am-md blockquote, html[data-theme="paper"] .am-intro { font-size: var(--am-fs-lead); line-height: 1.75; }
+html[data-theme="paper"] .am-md p { margin-bottom: 12px; }
+html[data-theme="paper"] .am-md table { font-family: var(--font-sans); }
+</style>
+</head>
+<body>
+<div class="am-toolbar" data-am-root-lang="zh-CN" data-am-root-theme="paper" data-am-root-mode="auto" data-am-root-style="80">
+<label class="am-pick">主题<select data-am="theme"><option value="blueprint">图纸</option><option value="shadcn">卡片</option><option value="paper" selected>纸张</option></select></label>
+<label class="am-pick">明暗<select data-am="mode"><option value="auto" selected>跟随系统</option><option value="light">亮</option><option value="dark">暗</option></select></label>
+<button class="am-btn" type="button" data-am="scale-down" data-min="0.8" data-max="1.5" data-step="0.05" aria-label="缩小文字" title="缩小文字" hidden>A−</button><button class="am-btn" type="button" data-am="scale-up" data-min="0.8" data-max="1.5" data-step="0.05" aria-label="放大文字" title="放大文字" hidden>A+</button>
+<button class="am-btn am-btn--reply" type="button" data-am="reply" data-ui="{&quot;button&quot;:&quot;回复&quot;,&quot;comment&quot;:&quot;评论&quot;,&quot;commentHint&quot;:&quot;对这个面板的意见&quot;,&quot;title&quot;:&quot;你的回复&quot;,&quot;hint&quot;:&quot;复制后粘贴回和 Agent 的对话，它会按你的选择和意见继续。&quot;,&quot;copy&quot;:&quot;复制回复&quot;,&quot;copyFailed&quot;:&quot;复制失败 — 请按 Cmd/Ctrl+C&quot;,&quot;close&quot;:&quot;关闭&quot;,&quot;suggested&quot;:&quot;建议&quot;,&quot;empty&quot;:&quot;先选择选项，或在面板上写评论。&quot;,&quot;decisions&quot;:&quot;决定&quot;,&quot;comments&quot;:&quot;评论&quot;,&quot;confirmed&quot;:&quot;确认了建议&quot;,&quot;untouched&quot;:&quot;未作答，建议&quot;,&quot;was&quot;:&quot;原为&quot;,&quot;typed&quot;:&quot;以 \&quot;&gt;\&quot; 开头的行是读者输入的文字。&quot;,&quot;raw&quot;:&quot;查看将复制的文本&quot;,&quot;preview&quot;:&quot;预览&quot;,&quot;count&quot;:{&quot;answered&quot;:&quot;已作答 {n} 项&quot;,&quot;comments&quot;:&quot;评论 {n} 条&quot;,&quot;remarks&quot;:&quot;标注 {n} 处&quot;},&quot;done&quot;:&quot;已复制 ✓&quot;,&quot;remarks&quot;:&quot;标注&quot;,&quot;kinds&quot;:{&quot;suggestion&quot;:&quot;建议&quot;,&quot;keep&quot;:&quot;保留&quot;,&quot;question&quot;:&quot;疑问&quot;,&quot;concern&quot;:&quot;关注&quot;}}">回复</button>
+<button class="am-btn am-btn--remark" type="button" data-am="remark" data-ui="{&quot;button&quot;:&quot;标注&quot;,&quot;need&quot;:&quot;选择标签后才能保存&quot;,&quot;hint&quot;:&quot;批注（可选）&quot;,&quot;save&quot;:&quot;保存&quot;,&quot;remove&quot;:&quot;删除&quot;,&quot;clear&quot;:&quot;清除所有标注&quot;,&quot;clearConfirm&quot;:&quot;再次点击以清除 {n} 条标注&quot;,&quot;section&quot;:&quot;标注&quot;,&quot;kinds&quot;:{&quot;suggestion&quot;:&quot;建议&quot;,&quot;keep&quot;:&quot;保留&quot;,&quot;question&quot;:&quot;疑问&quot;,&quot;concern&quot;:&quot;关注&quot;}}">标注</button>
+<button class="am-btn" type="button" data-am="copy" data-done="已复制 ✓">复制源稿</button>
+</div>
+<main class="am-doc">
+<header class="am-head"><p class="am-colophon">Generated by <a href="https://github.com/QingYunA/answer-me-with-html" target="_blank" rel="noopener">Answer me with HTML</a> 0.5.10 · 2026-11-03 23:13 · <a href="https://github.com/QingYunA/answer-me-with-html" target="_blank" rel="noopener">★ Star on GitHub</a></p><h1>班序 V1.7 · 功能回归报告</h1><p class="am-sub">自动规则、人工编辑、数据往返与版本保护</p><div class="am-head-meta"><span><b>日期</b>2026-11-03</span><span><b>测试数据</b>构造样本与本地虚拟员工</span></div></header>
+<div class="am-doc-layout am-doc-layout--rail-end">
+<nav class="am-toc" aria-label="目录" data-side="end" data-flow="in"><details class="am-outline"><summary aria-label="目录"><span class="am-ticks" aria-hidden="true"><i class="am-tick" data-id="A" data-title="A · 回归结果"></i><i class="am-tick" data-id="B" data-title="B · 自动测试范围"></i><i class="am-tick" data-id="C" data-title="C · 浏览器实际操作"></i><i class="am-tick" data-id="D" data-title="D · 重点冲突与修复"></i><i class="am-tick" data-id="E" data-title="E · 验证方式与范围"></i></span></summary><ol class="am-outline-list"><li><a href="#panel-A">A · 回归结果</a></li><li><a href="#panel-B">B · 自动测试范围</a></li><li><a href="#panel-C">C · 浏览器实际操作</a></li><li><a href="#panel-D">D · 重点冲突与修复</a></li><li><a href="#panel-E">E · 验证方式与范围</a></li></ol></details></nav>
+<div class="am-doc-body">
+<section class="am-panel" id="panel-A">
+<header class="am-panel-head"><span class="am-panel-id">A</span><h2>回归结果</h2></header>
+<div class="am-panel-body"><div class="am-md"><p>本次修改后的104项自动测试全部通过。
+构建同时检查TypeScript和Vue模板。
+浏览器已验证实际生成、编辑、保存和版本确认流程。
+正式业务数据仍需负责人按实际节假日和人员核对。</p>
+<p>先对基线运行86项测试，并完成6组定向诊断。
+实现后替换与新需求冲突的旧断言，再新增18项边界测试。
+测试没有沿用“保护格禁止编辑”等已废止的要求。</p>
+</div></div>
+</section>
+<section class="am-panel" id="panel-B">
+<header class="am-panel-head"><span class="am-panel-id">B</span><h2>自动测试范围</h2></header>
+<div class="am-panel-body"><div class="am-md"><div class="am-table-wrap"><table>
+<thead>
+<tr>
+<th>测试模块</th>
+<th>数量</th>
+<th>覆盖内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>员工初始化导入</td>
+<td>5</td>
+<td>编号、同名、更新、日期及错误行</td>
+</tr>
+<tr>
+<td>日期需求配置</td>
+<td>7</td>
+<td>单日、批量、休息跳过、恢复默认及快照</td>
+</tr>
+<tr>
+<td>休假计划</td>
+<td>11</td>
+<td>独立计划、增删改、实际状态及备份</td>
+</tr>
+<tr>
+<td>月度编辑与清空</td>
+<td>14</td>
+<td>全状态选择、批量、锁定、修订及原子失败</td>
+</tr>
+<tr>
+<td>首次排班</td>
+<td>7</td>
+<td>无员工、无上月、已有人工安排与初始化</td>
+</tr>
+<tr>
+<td>Excel服务</td>
+<td>12</td>
+<td>颜色、矩阵、明细、往返及无效输入</td>
+</tr>
+<tr>
+<td>加班</td>
+<td>11</td>
+<td>自动保留、撤销、统计、边界与Excel</td>
+</tr>
+<tr>
+<td>基础排班</td>
+<td>19</td>
+<td>两人、容量、确定性、跨月、光子及统计</td>
+</tr>
+<tr>
+<td>V1.7专项</td>
+<td>18</td>
+<td>分类别轮换、任意编辑、自定义和加班转换</td>
+</tr>
+<tr>
+<td>合计</td>
+<td>104</td>
+<td>全部通过</td>
+</tr>
+</tbody></table></div>
+<p>V1.7专项分别验证早、中、晚的相反房间匹配。
+同类别先比较累计天数，只有平票时才参考最后一次。
+休假改普通班锁定后保留，解锁后两种生成均恢复计划。
+自定义占用16人之一时，普通班正确报告15人的缺口。</p>
+</div></div>
+</section>
+<section class="am-panel" id="panel-C">
+<header class="am-panel-head"><span class="am-panel-id">C</span><h2>浏览器实际操作</h2></header>
+<div class="am-panel-body"><div class="am-md"><div class="am-table-wrap"><table>
+<thead>
+<tr>
+<th>操作</th>
+<th>观察结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>打开尚无班表的2027年2月</td>
+<td>显示员工月表，可直接编辑</td>
+</tr>
+<tr>
+<td>周末填写自定义名称</td>
+<td>首次保存建立草稿，单元格显示名称</td>
+</tr>
+<tr>
+<td>周末改普通班</td>
+<td>保存成功，默认勾选人工锁定</td>
+</tr>
+<tr>
+<td>多选周末和已有自定义格</td>
+<td>两格均可选择，批量自定义保存成功</td>
+</tr>
+<tr>
+<td>配置员工预定休假后到月表改普通班</td>
+<td>月表成功改变，计划表黄色格仍保留</td>
+</tr>
+<tr>
+<td>查看工作日历</td>
+<td>只有两个页签，开班保存不需要原因</td>
+</tr>
+<tr>
+<td>查看固定规则与自定义统计</td>
+<td>无规则切换，自定义按名称显示人天</td>
+</tr>
+<tr>
+<td>再次自动生成</td>
+<td>已锁定改班、自定义均保留，计划冲突仍提示</td>
+</tr>
+<tr>
+<td>解锁计划休假日的普通班后重排</td>
+<td>恢复黄色预定休假，自定义不变</td>
+</tr>
+<tr>
+<td>缺口与计划冲突消除后检查确认</td>
+<td>显示无硬冲突，确认按钮可用</td>
+</tr>
+<tr>
+<td>确认后再次编辑自定义名称</td>
+<td>建立修订草稿，原确认版仍在版本记录</td>
+</tr>
+<tr>
+<td>刷新后重新选择月份</td>
+<td>已保存自定义、计划和班表仍可查看</td>
+</tr>
+</tbody></table></div>
+<figure class="am-figure"><img data-am-src="../output/banxu-custom-edit.jpg" src="data:image/jpeg;base64,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" alt="自定义编辑面板：周末可设置名称，无需填写原因。"><figcaption>自定义编辑面板：周末可设置名称，无需填写原因。</figcaption></figure>
+</div></div>
+</section>
+<section class="am-panel" id="panel-D">
+<header class="am-panel-head"><span class="am-panel-id">D</span><h2>重点冲突与修复</h2></header>
+<div class="am-panel-body"><div class="am-md"><p>相反房间是优先目标，不覆盖未结束的跨月原班。
+普通班仍需两人，自定义和加班不能抵消普通班缺口。
+人工编辑可保存冲突，确认版本仍受硬约束检查。</p>
+<p>工作段改为只看开班日历和任职边界。
+月度休息、请假、假期、自定义不再反向切段。
+计划来源与人工实际状态分离，重排按锁定策略处理。</p>
+<p>容量计算包含所有已经保留的普通班安排。
+任职期外人工安排仍报错，不能因此再多排普通班人员。</p>
+<p>任意状态改加班后，撤销可恢复原班、请假或自定义名称。
+有效预定休假仍优先恢复。
+清空加班时，原普通班或自定义也一并清除，不重新变为出勤。
+相关边界均有自动测试覆盖。</p>
+</div></div>
+</section>
+<section class="am-panel" id="panel-E">
+<header class="am-panel-head"><span class="am-panel-id">E</span><h2>验证方式与范围</h2></header>
+<div class="am-panel-body"><div class="am-md"><p>自动测试使用 <code>npm test</code>。
+正式构建使用 <code>npm run build</code>。
+修改检查使用 <code>git diff --check</code>。
+浏览器操作使用独立测试地址和虚拟员工，不修改真实业务库。</p>
+<p>Excel验证包含月度矩阵和结构化明细两种格式。
+自定义名称包含尾部U的样本，确保不被普通班标记清理逻辑截断。
+JSON验证包含自定义和加班原状态，恢复后保持相同业务数据。</p>
+<p>排班器会搜索多个候选，但不承诺找到所有复杂约束的可行解。
+未排满会如实报告缺口，不把超时当作业务无解。
+构建保留ExcelJS较大分包的既有提示，不影响构建成功。</p>
+</div></div>
+</section>
+</div>
+</div>
+</main>
+<textarea id="am-source" hidden readonly aria-hidden="true">---
+title: 班序 V1.7 · 功能回归报告
+subtitle: 自动规则、人工编辑、数据往返与版本保护
+lang: zh
+template: doc
+theme: paper
+outline: right
+日期: 2026-11-03
+测试数据: 构造样本与本地虚拟员工
+---
+
+## A 回归结果
+
+本次修改后的104项自动测试全部通过。
+构建同时检查TypeScript和Vue模板。
+浏览器已验证实际生成、编辑、保存和版本确认流程。
+正式业务数据仍需负责人按实际节假日和人员核对。
+
+先对基线运行86项测试，并完成6组定向诊断。
+实现后替换与新需求冲突的旧断言，再新增18项边界测试。
+测试没有沿用“保护格禁止编辑”等已废止的要求。
+
+## B 自动测试范围
+
+| 测试模块 | 数量 | 覆盖内容 |
+| --- | --- | --- |
+| 员工初始化导入 | 5 | 编号、同名、更新、日期及错误行 |
+| 日期需求配置 | 7 | 单日、批量、休息跳过、恢复默认及快照 |
+| 休假计划 | 11 | 独立计划、增删改、实际状态及备份 |
+| 月度编辑与清空 | 14 | 全状态选择、批量、锁定、修订及原子失败 |
+| 首次排班 | 7 | 无员工、无上月、已有人工安排与初始化 |
+| Excel服务 | 12 | 颜色、矩阵、明细、往返及无效输入 |
+| 加班 | 11 | 自动保留、撤销、统计、边界与Excel |
+| 基础排班 | 19 | 两人、容量、确定性、跨月、光子及统计 |
+| V1.7专项 | 18 | 分类别轮换、任意编辑、自定义和加班转换 |
+| 合计 | 104 | 全部通过 |
+
+V1.7专项分别验证早、中、晚的相反房间匹配。
+同类别先比较累计天数，只有平票时才参考最后一次。
+休假改普通班锁定后保留，解锁后两种生成均恢复计划。
+自定义占用16人之一时，普通班正确报告15人的缺口。
+
+## C 浏览器实际操作
+
+| 操作 | 观察结果 |
+| --- | --- |
+| 打开尚无班表的2027年2月 | 显示员工月表，可直接编辑 |
+| 周末填写自定义名称 | 首次保存建立草稿，单元格显示名称 |
+| 周末改普通班 | 保存成功，默认勾选人工锁定 |
+| 多选周末和已有自定义格 | 两格均可选择，批量自定义保存成功 |
+| 配置员工预定休假后到月表改普通班 | 月表成功改变，计划表黄色格仍保留 |
+| 查看工作日历 | 只有两个页签，开班保存不需要原因 |
+| 查看固定规则与自定义统计 | 无规则切换，自定义按名称显示人天 |
+| 再次自动生成 | 已锁定改班、自定义均保留，计划冲突仍提示 |
+| 解锁计划休假日的普通班后重排 | 恢复黄色预定休假，自定义不变 |
+| 缺口与计划冲突消除后检查确认 | 显示无硬冲突，确认按钮可用 |
+| 确认后再次编辑自定义名称 | 建立修订草稿，原确认版仍在版本记录 |
+| 刷新后重新选择月份 | 已保存自定义、计划和班表仍可查看 |
+
+![自定义编辑面板：周末可设置名称，无需填写原因。](../output/banxu-custom-edit.jpg)
+
+## D 重点冲突与修复
+
+相反房间是优先目标，不覆盖未结束的跨月原班。
+普通班仍需两人，自定义和加班不能抵消普通班缺口。
+人工编辑可保存冲突，确认版本仍受硬约束检查。
+
+工作段改为只看开班日历和任职边界。
+月度休息、请假、假期、自定义不再反向切段。
+计划来源与人工实际状态分离，重排按锁定策略处理。
+
+容量计算包含所有已经保留的普通班安排。
+任职期外人工安排仍报错，不能因此再多排普通班人员。
+
+任意状态改加班后，撤销可恢复原班、请假或自定义名称。
+有效预定休假仍优先恢复。
+清空加班时，原普通班或自定义也一并清除，不重新变为出勤。
+相关边界均有自动测试覆盖。
+
+## E 验证方式与范围
+
+自动测试使用 `npm test`。
+正式构建使用 `npm run build`。
+修改检查使用 `git diff --check`。
+浏览器操作使用独立测试地址和虚拟员工，不修改真实业务库。
+
+Excel验证包含月度矩阵和结构化明细两种格式。
+自定义名称包含尾部U的样本，确保不被普通班标记清理逻辑截断。
+JSON验证包含自定义和加班原状态，恢复后保持相同业务数据。
+
+排班器会搜索多个候选，但不承诺找到所有复杂约束的可行解。
+未排满会如实报告缺口，不把超时当作业务无解。
+构建保留ExcelJS较大分包的既有提示，不影响构建成功。
+</textarea>
+<script>
+(() => {
+// How a formula reads in a quote. MathML has no plain text, so src/math.js writes the formula as the draft wrote it, delimiters included, in
+// data-am-tex on the <math> element, and the Remark and Reply scripts read page text through this file. On a page without math there is no
+// such element, so formulaOf is null and every text comes out as it did before.
+// A plain ES module for tests; the page gets it with its `export` keyword dropped (src/runtime/compose.js).
+
+const TEX = 'data-am-tex';
+
+// The formula that holds a node, or null.
+const formulaOf = (node) => node.parentElement?.closest(`[${TEX}]`) ?? null;
+
+const firstText = (el) => {
+  for (const child of el.childNodes) {
+    const found = child.nodeType === 3 ? child : firstText(child);
+    if (found) return found;
+  }
+  return null;
+};
+
+// What a text node adds to a quote: its data. The first text node of a formula adds the formula, and the others add nothing.
+// (A formula in an error style is plain text with its delimiters, not a <math>, so it comes out once.)
+function nodeText(node) {
+  const math = formulaOf(node);
+  if (!math) return node.data;
+  return firstText(math) === node ? math.getAttribute(TEX) : '';
+}
+
+// The text of a node as textContent reads it, but with each formula as written.
+const textWithMath = (node) => (node.nodeType === 3 ? nodeText(node) : [...node.childNodes].map(textWithMath).join(''));
+
+(() => {
+  const root = document.documentElement;
+  // A host that serves this page inside its own document leaves the real root without the page's settings. The toolbar keeps a copy;
+  // set back what the root lacks, before anything below reads the root. A root's own value, even an empty one, is never replaced.
+  const carrier = document.querySelector('.am-toolbar');
+  for (const [attr, key] of [['lang', 'data-am-root-lang'], ['dir', 'data-am-root-dir'], ['data-theme', 'data-am-root-theme'], ['data-mode', 'data-am-root-mode'], ['data-style', 'data-am-root-style']]) {
+    if (root.getAttribute(attr) === null && carrier?.getAttribute(key) != null) root.setAttribute(attr, carrier.getAttribute(key));
+  }
+  // Each toolbar list sets one root attribute; its options name the values, so the runtime names no theme or mode.
+  for (const [name, attr] of [['theme', 'data-theme'], ['mode', 'data-mode']]) {
+    const select = document.querySelector(`select[data-am="${name}"]`);
+    if (!select) continue;
+    select.value = root.getAttribute(attr);
+    select.addEventListener('change', () => root.setAttribute(attr, select.value));
+  }
+
+  // ── Text size ─────────────────────────────
+  // A− / A+ set --am-scale on the root; every page size and line (src/themes/type-scale.js) follows it, and the drawing boxes grow
+  // with it while their viewBox keeps the units Node measured. The buttons carry the range from SCALE, so this script keeps no
+  // second copy of the numbers. A reader's choice is remembered in this browser and wins over the page's own scale; where storage
+  // is off (am serve, file://) it lasts for this tab, and the click still works.
+  const scaleDown = document.querySelector('[data-am="scale-down"]');
+  const scaleUp = document.querySelector('[data-am="scale-up"]');
+  if (scaleDown && scaleUp) {
+    const min = Number(scaleDown.dataset.min);
+    const max = Number(scaleDown.dataset.max);
+    const step = Number(scaleDown.dataset.step);
+    const storeKey = 'am-scale';
+    let value;
+
+    const inRange = (n) => Number.isFinite(n) && n >= min && n <= max;
+    const savedScale = () => {
+      try {
+        return Number(localStorage.getItem(storeKey));
+      } catch {
+        return NaN;
+      }
+    };
+    const saveScale = (n) => {
+      try {
+        localStorage.setItem(storeKey, String(n));
+      } catch {
+        // Storage may be off (am serve, file://); the size then lasts until the tab closes.
+      }
+    };
+
+    const updateButtons = () => {
+      const setUnavailable = (btn, unavailable) => {
+        if (unavailable) btn.setAttribute('aria-disabled', 'true');
+        else btn.removeAttribute('aria-disabled');
+      };
+      setUnavailable(scaleDown, value <= min);
+      setUnavailable(scaleUp, value >= max);
+    };
+
+    // One step is a multiple of `step`: Math.round first, then two decimals, so 1.1500000000000001 becomes 1.15.
+    const setScale = (next, remember = false) => {
+      value = Math.min(max, Math.max(min, Number((Math.round(next / step) * step).toFixed(2))));
+      root.style.setProperty('--am-scale', String(value));
+      for (const svg of document.querySelectorAll('.am-diagram:not(.am-lightbox-canvas) > svg[role="img"]')) {
+        const box = svg.viewBox?.baseVal;
+        if (!box || !(box.width > 0) || !(box.height > 0)) continue;
+        svg.setAttribute('width', String(Math.ceil(box.width * value)));
+        svg.setAttribute('height', String(Math.ceil(box.height * value)));
+      }
+      updateButtons();
+      if (remember) saveScale(value);
+      window.dispatchEvent(new Event('am-scale'));
+    };
+
+    // A page with no stored choice is left exactly as it was rendered: no inline variable, no svg rewrite, no extra layout pass.
+    value = parseFloat(getComputedStyle(root).getPropertyValue('--am-scale')) || 1;
+    updateButtons();
+    const saved = savedScale();
+    if (inRange(saved) && saved !== value) setScale(saved);
+    scaleDown.hidden = false;
+    scaleUp.hidden = false;
+    scaleDown.addEventListener('click', () => {
+      if (scaleDown.getAttribute('aria-disabled') === 'true') return;
+      setScale(value - step, true);
+    });
+    scaleUp.addEventListener('click', () => {
+      if (scaleUp.getAttribute('aria-disabled') === 'true') return;
+      setScale(value + step, true);
+    });
+  }
+
+  // A phone cannot show the whole toolbar. Its end (Reply, Remark, Copy source) is what a phone showed before the text-size
+  // buttons, so open at that end: Theme, Mode and A− / A+ are reached by scrolling toward the start. A reader scroll leaves the
+  // position we set, so a later resize does not pull the toolbar back.
+  if (carrier) {
+    const rtl = getComputedStyle(carrier).direction === 'rtl';
+    let lastProgrammatic = null;
+    let readerScrolled = false;
+    const scrollToEnd = () => {
+      if (carrier.scrollWidth <= carrier.clientWidth) return;
+      // Chrome keeps a right-to-left box's scrollLeft negative; the browser clamps either value to the real end.
+      carrier.scrollTo({ left: rtl ? -carrier.scrollWidth : carrier.scrollWidth });
+      lastProgrammatic = carrier.scrollLeft;
+    };
+    carrier.addEventListener('scroll', () => {
+      if (Math.abs(carrier.scrollLeft - lastProgrammatic) > 1) readerScrolled = true;
+    });
+    scrollToEnd();
+    addEventListener('resize', () => {
+      if (!readerScrolled) scrollToEnd();
+    });
+  }
+
+  const copyText = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const ta = Object.assign(document.createElement('textarea'), { value: text });
+      document.body.append(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+  };
+  // A button reads its label from data-done for a moment after a copy, then comes back to the label it started from. That label is
+  // read once, here: a second click inside the moment would otherwise read the copied label off the button and restore that instead,
+  // and the label would never come back. The moment starts again on each click: the timer of the previous one is left to fire and
+  // does nothing (a token, so this needs no timer bookkeeping the page scripts do not already have).
+  const flasher = (btn) => {
+    const idle = btn.textContent;
+    let clicks = 0;
+    return () => {
+      btn.textContent = btn.dataset.done;
+      const mine = ++clicks;
+      setTimeout(() => { if (mine === clicks) btn.textContent = idle; }, 1400);
+    };
+  };
+
+  const copyBtn = document.querySelector('[data-am="copy"]');
+  if (copyBtn) {
+    const flash = flasher(copyBtn);
+    copyBtn.addEventListener('click', async () => {
+      const nodes = document.querySelectorAll('#am-source');
+      await copyText(nodes[nodes.length - 1]?.value ?? '');
+      flash();
+    });
+  }
+
+  // Each code block copies its own lines, without the line numbers.
+  for (const btn of document.querySelectorAll('[data-am="copy-code"]')) {
+    const flash = flasher(btn);
+    btn.addEventListener('click', async () => {
+      const lines = btn.closest('.am-codeblock')?.querySelectorAll('.am-ln') ?? [];
+      await copyText([...lines].map((l) => l.textContent).join('\n'));
+      flash();
+    });
+  }
+
+  // ── Diagram Lightbox & Pan-Zoom Viewer ─────────────
+  const diagrams = document.querySelectorAll('.am-diagram:not(.am-lightbox-canvas)');
+  const lb = document.querySelector('.am-lightbox');
+  if (diagrams.length && lb) {
+    const backdrop = lb.querySelector('.am-lightbox-backdrop');
+    const titleText = lb.querySelector('.am-lightbox-title-text');
+    const stage = lb.querySelector('.am-lightbox-stage');
+    const canvas = lb.querySelector('.am-lightbox-canvas');
+    const closeBtn = lb.querySelector('.am-lightbox-close');
+    const expandLabel = lb.getAttribute('data-expand') || 'Expand diagram';
+
+    let scale = 1, x = 0, y = 0, fitScale = 1, curVw = 800, curVh = 600;
+    let isDragging = false, activePointerId = null, startX = 0, startY = 0, origX = 0, origY = 0;
+    let lastTrigger = null;
+
+    const apply = () => {
+      canvas.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
+    };
+
+    const zoomTo = (newScale, pivotX, pivotY) => {
+      newScale = Math.max(0.2, Math.min(6.0, newScale));
+      if (Math.abs(newScale - scale) < 0.0001) return;
+      const r = newScale / scale;
+      x = pivotX - (pivotX - x) * r;
+      y = pivotY - (pivotY - y) * r;
+      scale = newScale;
+      apply();
+    };
+
+    const open = (diag, trigger) => {
+      const svg = [...diag.children].find((el) => el.tagName.toLowerCase() === 'svg');
+      if (!svg) return;
+      lastTrigger = trigger;
+
+      const panel = diag.closest('.am-panel');
+      const panelTitle = panel?.querySelector('.am-panel-head h2')?.textContent?.trim() || panel?.querySelector('h2')?.textContent?.trim() || lb.getAttribute('aria-label') || 'Diagram viewer';
+      if (titleText) titleText.textContent = panelTitle;
+
+      const clone = svg.cloneNode(true);
+      const defElements = clone.querySelectorAll('[id]');
+      if (defElements.length) {
+        const idMap = new Map();
+        defElements.forEach((el, i) => {
+          const oldId = el.id;
+          const newId = `${oldId}-lb-${i}`;
+          idMap.set(oldId, newId);
+          el.id = newId;
+        });
+        const urlAttrs = ['marker-start', 'marker-mid', 'marker-end', 'fill', 'stroke', 'filter', 'clip-path', 'mask'];
+        clone.querySelectorAll('*').forEach((el) => {
+          for (const attr of urlAttrs) {
+            const val = el.getAttribute(attr);
+            if (val && val.startsWith('url(#')) {
+              const id = val.slice(5, -1);
+              if (idMap.has(id)) el.setAttribute(attr, `url(#${idMap.get(id)})`);
+            }
+          }
+          const href = el.getAttribute('href') || el.getAttribute('xlink:href');
+          if (href && href.startsWith('#')) {
+            const id = href.slice(1);
+            if (idMap.has(id)) {
+              if (el.hasAttribute('href')) el.setAttribute('href', `#${idMap.get(id)}`);
+              if (el.hasAttribute('xlink:href')) el.setAttribute('xlink:href', `#${idMap.get(id)}`);
+            }
+          }
+        });
+      }
+
+      const vb = svg.viewBox?.baseVal;
+      curVw = (vb && vb.width > 0) ? vb.width : (parseFloat(svg.getAttribute('width')) || svg.clientWidth || 800);
+      curVh = (vb && vb.height > 0) ? vb.height : (parseFloat(svg.getAttribute('height')) || svg.clientHeight || 600);
+      clone.style.width = `${curVw}px`;
+      clone.style.height = `${curVh}px`;
+      canvas.innerHTML = '';
+      canvas.append(clone);
+      lb.removeAttribute('hidden');
+      document.body.style.overflow = 'hidden';
+
+      const rect = stage.getBoundingClientRect();
+      const pad = 48;
+      const availW = Math.max(100, rect.width - pad * 2);
+      const availH = Math.max(100, rect.height - pad * 2);
+      fitScale = Math.min(availW / curVw, availH / curVh, 1.0);
+      scale = fitScale;
+      x = (rect.width - curVw * scale) / 2;
+      y = (rect.height - curVh * scale) / 2;
+      apply();
+      closeBtn.focus();
+    };
+
+    const close = () => {
+      if (lb.hasAttribute('hidden')) return;
+      lb.setAttribute('hidden', '');
+      canvas.innerHTML = '';
+      document.body.style.overflow = '';
+      lastTrigger?.focus();
+    };
+
+    stage.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const rect = stage.getBoundingClientRect();
+      const dy = e.deltaMode === 1 ? e.deltaY * 16 : (e.deltaMode === 2 ? e.deltaY * 400 : e.deltaY);
+      const factor = Math.exp(-Math.max(-200, Math.min(200, dy)) * 0.0015);
+      zoomTo(scale * factor, e.clientX - rect.left, e.clientY - rect.top);
+    }, { passive: false });
+
+    stage.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0 || isDragging) return;
+      isDragging = true;
+      activePointerId = e.pointerId;
+      startX = e.clientX;
+      startY = e.clientY;
+      origX = x;
+      origY = y;
+      stage.setPointerCapture(e.pointerId);
+      stage.classList.add('am-panning');
+    });
+
+    stage.addEventListener('pointermove', (e) => {
+      if (!isDragging || e.pointerId !== activePointerId) return;
+      x = origX + (e.clientX - startX);
+      y = origY + (e.clientY - startY);
+      apply();
+    });
+
+    const endDrag = (e) => {
+      if (!isDragging || e.pointerId !== activePointerId) return;
+      isDragging = false;
+      activePointerId = null;
+      stage.classList.remove('am-panning');
+      try { stage.releasePointerCapture(e.pointerId); } catch {}
+    };
+    stage.addEventListener('pointerup', endDrag);
+    stage.addEventListener('pointercancel', endDrag);
+
+    stage.addEventListener('dblclick', () => {
+      const rect = stage.getBoundingClientRect();
+      scale = fitScale;
+      x = (rect.width - curVw * scale) / 2;
+      y = (rect.height - curVh * scale) / 2;
+      apply();
+    });
+
+    closeBtn.addEventListener('click', close);
+    backdrop.addEventListener('click', close);
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !lb.hasAttribute('hidden')) close();
+    });
+
+    lb.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab') return;
+      const focusables = lb.querySelectorAll('button:not([disabled]), [tabindex]:not([tabindex="-1"])');
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+
+    const expandSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>';
+    diagrams.forEach((diag) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'am-diagram-expand';
+      btn.title = expandLabel;
+      btn.setAttribute('aria-label', expandLabel);
+      btn.innerHTML = expandSvg;
+      btn.addEventListener('click', () => open(diag, btn));
+      diag.prepend(btn);
+    });
+  }
+})();
+(() => {
+// The reply a reader copies from the page: one Markdown text with the decisions, the panel comments and the block remarks.
+// A plain ES module for tests; the page gets it with its `export` keyword dropped (src/runtime/compose.js).
+// decisions: [{ panel, question, picked: [label], suggested: [label], touched }]; comments: [{ panel, title, text }];
+// remarks: [{ panel, quote, kind, note }], where quote is the start of the marked block and kind is a key of ui.kinds.
+// Comment and remark text is quoted line by line, so text the reader typed cannot pass as part of the structure.
+// rtl: the page reads right to left, so the arrow before each answer points left, the way the text runs.
+function replyText({ title, decisions, comments, remarks = [], ui, rtl = false }) {
+  const arrow = rtl ? '←' : '→';
+  const out = [`# Re: ${title}`];
+  if (decisions.length) {
+    out.push('', `## ${ui.decisions}`);
+    decisions.forEach((d, i) => {
+      const answer = d.picked.length ? d.picked.map((l) => `**${l}**`).join(', ') : '**—**';
+      // Every option starts unselected, so an ask the reader never clicked has no answer: the reply names the suggestion
+      // instead of passing it off as the reader's choice.
+      const same = d.picked.length === d.suggested.length && d.picked.every((l) => d.suggested.includes(l));
+      const suggested = d.suggested.join(', ') || '—';
+      const why = !d.touched ? `${ui.untouched}: ${suggested}` : same ? ui.confirmed : `${ui.was}: ${suggested}`;
+      out.push(`${i + 1}. [${d.panel}] ${d.question}`, `   ${arrow} ${answer} _(${why})_`);
+    });
+  }
+  const written = comments.filter((c) => c.text.trim());
+  const quoted = (text) => (text.trim() ? text.trim().split('\n').map((l) => `  > ${l}`) : []);
+  if (written.length) {
+    out.push('', `## ${ui.comments}`);
+    for (const c of written) out.push(`- **${c.panel} · ${c.title}**`, ...quoted(c.text));
+  }
+  if (remarks.length) {
+    out.push('', `## ${ui.remarks}`);
+    for (const r of remarks) {
+      const label = [r.panel, ui.kinds?.[r.kind] ?? r.kind].filter(Boolean).join(' · ');
+      out.push(`- **${label}** "${r.quote}"`, ...quoted(r.note));
+    }
+  }
+  if (written.length || remarks.some((r) => r.note.trim())) out.push('', `_${ui.typed}_`);
+  return `${out.join('\n')}\n`;
+}
+
+// A letter of a right-to-left script. One definition for the page builder (src/bidi.js) and for the right-to-left page script
+// (src/runtime/reply-view.js), so the two cannot drift apart. A plain ES module; the page script gets this file in front of
+// reply-view.js, with its `export` keyword dropped and reply-view.js's import of it removed (src/runtime/compose.js).
+const RTL_LETTER = /[\p{Script=Hebrew}\p{Script=Arabic}\p{Script=Syriac}\p{Script=Thaana}\p{Script=Nko}\p{Script=Samaritan}\p{Script=Mandaic}]/u;
+
+// The reply as the reader sees it in the Reply sheet (src/runtime/reply.js): the Markdown that Copy copies, drawn as headings, bold answers
+// and quoted comments instead of raw "# Re: ...", "1. [E] ..." and "- **A · ...**" lines. Each line gets its own direction, so a
+// Hebrew reader sees Latin answers and paths in place; a line with no right-to-left letter reads left to right, as on any other page.
+// The raw Markdown stays in the sheet under a fold, so the copied text does not change.
+// A plain ES module for tests; the page gets it with its `export` keyword dropped and rtl-letter.js in front of it in place of the
+// import (src/runtime/compose.js).
+
+const escHtml = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+// A line with a right-to-left letter reads right to left; a line without one (an English comment, a path) reads left to right.
+const dirOf = (s) => (RTL_LETTER.test(s) ? 'rtl' : 'ltr');
+
+// The only inline Markdown src/runtime/reply-text.js writes: **answer**, _(note)_ and the "quote" of a remark. Each piece is isolated in its own direction,
+// so a Latin answer inside a Hebrew line keeps its place, and "A · title" still starts with the panel letter.
+const piece = (tag, text) => `<${tag}><bdi dir="${dirOf(text)}">${text}</bdi></${tag}>`;
+function inline(s) {
+  return escHtml(s)
+    .replace(/\*\*(.+?)\*\*/g, (_, t) => piece('strong', t))
+    .replace(/(^|\s)_(.+?)_(?=\s|$)/g, (_, pre, t) => pre + piece('em', t))
+    // The quoted start of a marked block ("- **A · concern** "text""): isolated, so Latin text in a Hebrew line keeps its place.
+    .replace(/&quot;(.+)&quot;$/, (_, t) => `&quot;<bdi dir="${dirOf(t)}">${t}</bdi>&quot;`);
+}
+
+// The reply text (src/runtime/reply-text.js) as HTML, one block per line.
+function replyViewHtml(text) {
+  return text
+    .replace(/\n$/, '')
+    .split('\n')
+    .map((line) => {
+      const dir = dirOf(line);
+      let m;
+      if (!line.trim()) return '<div class="am-rv-gap"></div>';
+      if ((m = line.match(/^(#{1,2}) (.*)$/))) return `<div class="am-rv-h${m[1].length}" dir="${dir}">${inline(m[2])}</div>`;
+      if ((m = line.match(/^(\d+)\. \[([^\]]*)\] (.*)$/))) {
+        return `<div class="am-rv-q" dir="${dir}"><bdi>${m[1]}.</bdi> <bdi class="am-rv-tag">${escHtml(m[2])}</bdi> ${inline(m[3])}</div>`;
+      }
+      if ((m = line.match(/^ {3}([←→]) (.*)$/))) return `<div class="am-rv-a" dir="${dir}">${m[1]} ${inline(m[2])}</div>`;
+      if ((m = line.match(/^- (.*)$/))) return `<div class="am-rv-c" dir="${dir}">${inline(m[1])}</div>`;
+      // A comment line is shown exactly as the reader typed it.
+      if ((m = line.match(/^ {2}> ?(.*)$/))) return `<div class="am-rv-quote" dir="${dirOf(m[1])}">${escHtml(m[1]) || '&nbsp;'}</div>`;
+      return `<div dir="${dir}">${inline(line)}</div>`;
+    })
+    .join('');
+}
+
+// Answer on the page: every panel gets a Comment box, and the Reply button collects the ask answers, the comments and the remarks
+// into one Markdown reply (replyText) to copy back to the agent. Answers and comments stay in localStorage across reloads.
+// The remark script (remark.js) adds the blocks the reader marked, through window.__amRemarkData, and tells this script about a change
+// with an "am-remark-change" event on the document.
+// The Reply sheet shows the reply drawn (replyViewHtml) with the Markdown that Copy copies under a fold. Once the reader has given any
+// input, a bar at the bottom of the page shows the counts and copies the reply in one click, so there is no trip to the top-right button.
+const replyBtn = document.querySelector('[data-am="reply"]');
+const COMMENT_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>';
+if (replyBtn) {
+  const ui = JSON.parse(replyBtn.dataset.ui);
+  const storeKey = `am-reply:${location.pathname}`;
+  const panels = [...document.querySelectorAll('.am-panel')];
+  const asks = [...document.querySelectorAll('.am-ask')];
+  // Answers are saved by question text, so they still match after am patch has renumbered the asks.
+  // Page text without the word joiners a right-to-left page puts after a Hebrew prefix hyphen (src/bidi.js): the reply and the saved
+  // answers hold the text as the draft wrote it, a formula too (src/runtime/math-text.js).
+  const WJ = new RegExp(String.fromCharCode(0x2060), 'g');
+  const textOf = (el) => el && textWithMath(el).replace(WJ, '').trim();
+  const keyOf = (ask) => textOf(ask.querySelector('legend')) ?? ask.dataset.ask;
+  const touched = new Set();
+  const boxes = new Map();
+  // The bar is built below with the sheet; the handlers that change the counts only call this.
+  let refreshBar = () => {};
+  // The textarea a failed copy keeps selected, so the reader can still use the keyboard shortcut.
+  let stuck = null;
+
+  const load = () => {
+    try {
+      return JSON.parse(localStorage.getItem(storeKey)) || {};
+    } catch {
+      return {};
+    }
+  };
+  const save = () => {
+    const state = {
+      asks: Object.fromEntries(asks.map((a) => [keyOf(a), { picked: picked(a), touched: touched.has(a) }])),
+      comments: Object.fromEntries([...boxes].map(([id, box]) => [id, box.value]).filter(([, text]) => text.trim())),
+    };
+    try {
+      localStorage.setItem(storeKey, JSON.stringify(state));
+    } catch {
+      // Storage may be off (private window, file:// policy); answers then last until the page closes.
+    }
+  };
+  const picked = (ask) => [...ask.querySelectorAll('input')].filter((i) => i.checked).map((i) => i.value);
+  const panelOf = (el) => {
+    const panel = el.closest('.am-panel');
+    return { id: panel?.id.replace(/^panel-/, '') ?? '', title: textOf(panel?.querySelector('.am-panel-head h2')) ?? '' };
+  };
+
+  const saved = load();
+  for (const ask of asks) {
+    const inputs = [...ask.querySelectorAll('input')];
+    const state = saved.asks?.[keyOf(ask)];
+    // A saved answer applies only while every picked option still exists on the page, and only if the reader clicked: older versions started
+    // with the suggestion selected and saved it untouched, and that state must come back unselected.
+    if (state?.touched && state.picked.every((v) => inputs.some((i) => i.value === v))) {
+      for (const input of inputs) input.checked = state.picked.includes(input.value);
+      touched.add(ask);
+    }
+    // A click counts even on the option that is already picked: the reader confirms the suggestion.
+    const answer = () => {
+      touched.add(ask);
+      save();
+      refreshBar();
+    };
+    ask.addEventListener('change', answer);
+    ask.addEventListener('click', (e) => { if (e.target.matches('input')) answer(); });
+  }
+
+  for (const panel of panels) {
+    const id = panel.id.replace(/^panel-/, '');
+    // An icon only: narrow panels have no room for a word next to the title.
+    const btn = Object.assign(document.createElement('button'), { type: 'button', className: 'am-comment-btn', title: ui.comment, innerHTML: COMMENT_ICON });
+    btn.setAttribute('aria-label', `${ui.comment} ${id}`);
+    btn.setAttribute('aria-expanded', 'false');
+    const wrap = Object.assign(document.createElement('div'), { className: 'am-comment', hidden: true });
+    const box = Object.assign(document.createElement('textarea'), { rows: 3, placeholder: ui.commentHint, value: saved.comments?.[id] ?? '' });
+    box.setAttribute('aria-label', `${ui.comment} ${id}`);
+    wrap.append(box);
+    const show = (open) => {
+      wrap.hidden = !open;
+      btn.setAttribute('aria-expanded', String(open));
+    };
+    btn.addEventListener('click', () => {
+      show(wrap.hidden);
+      if (!wrap.hidden) box.focus();
+    });
+    box.addEventListener('input', () => {
+      btn.classList.toggle('am-comment-btn--on', Boolean(box.value.trim()));
+      save();
+      refreshBar();
+    });
+    btn.classList.toggle('am-comment-btn--on', Boolean(box.value.trim()));
+    if (box.value.trim()) show(true);
+    (panel.querySelector('.am-panel-head') ?? panel).append(btn);
+    panel.append(wrap);
+    boxes.set(id, box);
+  }
+
+  const sheet = document.createElement('dialog');
+  sheet.className = 'am-reply';
+  sheet.setAttribute('aria-label', ui.title);
+  sheet.innerHTML = '<div class="am-reply-head"><strong></strong><span></span></div><div class="am-reply-view" tabindex="0"></div><details class="am-reply-raw"><summary></summary><textarea readonly rows="10"></textarea></details><div class="am-reply-actions"><button type="button" class="am-btn" data-act="copy"></button><button type="button" class="am-btn" data-act="close"></button></div>';
+  sheet.querySelector('strong').textContent = ui.title;
+  sheet.querySelector('span').textContent = ui.hint;
+  sheet.querySelector('summary').textContent = ui.raw;
+  const view = sheet.querySelector('.am-reply-view');
+  const raw = sheet.querySelector('details');
+  const text = sheet.querySelector('textarea');
+  const copy = sheet.querySelector('[data-act="copy"]');
+  const close = sheet.querySelector('[data-act="close"]');
+  copy.textContent = ui.copy;
+  close.textContent = ui.close;
+  document.body.append(sheet);
+
+  const compose = () => {
+    const decisions = asks.map((ask) => ({
+      panel: panelOf(ask).id,
+      question: textOf(ask.querySelector('legend')) ?? '',
+      picked: picked(ask),
+      suggested: [...ask.querySelectorAll('input[data-suggested]')].map((i) => i.value),
+      touched: touched.has(ask),
+    }));
+    const comments = [...boxes].map(([id, box]) => ({ panel: id, title: panelOf(box).title, text: box.value }));
+    const remarks = window.__amRemarkData?.() ?? [];
+    const empty = !decisions.length && !comments.some((c) => c.text.trim()) && !remarks.length;
+    const title = textOf(document.querySelector('.am-head h1')) ?? document.title;
+    return empty ? '' : replyText({ title, decisions, comments, remarks, ui, rtl: document.documentElement.dir === 'rtl' });
+  };
+
+  // The text goes through the clipboard API; a page the browser treats as insecure (file://) falls back to selecting a temporary
+  // textarea, because the sheet's own textarea can sit inside a closed fold, where it cannot be selected.
+  // That fallback reports whether it worked. When it does not, the text stays selected (so Cmd/Ctrl+C still copies it) and the
+  // button says what to do instead of showing the "Copied ✓" label the reader cannot trust.
+  const copyText = async (str, btn) => {
+    stuck?.remove();
+    stuck = null;
+    try {
+      await navigator.clipboard.writeText(str);
+      // The close_after_reply script (close-after-reply.js) closes the tab once the reply is on the clipboard.
+      document.dispatchEvent(new Event('am-reply-copied'));
+    } catch {
+      const tmp = Object.assign(document.createElement('textarea'), { value: str });
+      tmp.style.cssText = 'position:fixed;top:-100px;opacity:0';
+      // Inside the sheet while it is open: while a modal dialog is open the rest of the document cannot take focus, so a textarea
+      // in the body can be selected but not focused, and the keyboard shortcut the reader is told to press would copy nothing.
+      // The bottom bar copies while the sheet is closed, and a closed dialog is not rendered, so there the textarea goes in the body.
+      (sheet.open ? sheet : document.body).append(tmp);
+      tmp.select();
+      let copied = false;
+      try {
+        copied = document.execCommand('copy');
+      } catch {
+        copied = false;
+      }
+      if (!copied) {
+        stuck = tmp;
+        btn.textContent = ui.copyFailed;
+        setTimeout(() => { btn.textContent = ui.copy; }, 3000);
+        return;
+      }
+      tmp.remove();
+    }
+    btn.textContent = ui.done;
+    setTimeout(() => { btn.textContent = ui.copy; }, 1400);
+  };
+
+  const open = () => {
+    const reply = compose();
+    if (reply) view.innerHTML = replyViewHtml(reply);
+    else view.textContent = ui.empty;
+    view.scrollTop = 0;
+    text.value = reply;
+    raw.open = false;
+    raw.hidden = !reply;
+    copy.disabled = !reply;
+    if (sheet.showModal) sheet.showModal();
+    else sheet.setAttribute('open', '');
+    (reply ? copy : close).focus();
+  };
+  replyBtn.addEventListener('click', open);
+  close.addEventListener('click', () => (sheet.close ? sheet.close() : sheet.removeAttribute('open')));
+  // A failed copy leaves the text selected for Cmd/Ctrl+C; closing the sheet drops that textarea.
+  sheet.addEventListener('close', () => { stuck?.remove(); stuck = null; });
+  copy.addEventListener('click', () => copyText(text.value, copy));
+
+  const bar = Object.assign(document.createElement('div'), { className: 'am-reply-bar', hidden: true });
+  bar.setAttribute('role', 'region');
+  bar.setAttribute('aria-label', ui.title);
+  const summary = Object.assign(document.createElement('span'), { className: 'am-reply-bar-count' });
+  summary.setAttribute('aria-live', 'polite');
+  const preview = Object.assign(document.createElement('button'), { type: 'button', className: 'am-btn', textContent: ui.preview });
+  const barCopy = Object.assign(document.createElement('button'), { type: 'button', className: 'am-btn am-btn--reply', textContent: ui.copy });
+  preview.addEventListener('click', open);
+  barCopy.addEventListener('click', () => copyText(compose(), barCopy));
+  bar.append(summary, preview, barCopy);
+  document.body.append(bar);
+
+  // The bar shows only the counts that are above zero, and only once there is any input at all.
+  refreshBar = () => {
+    const counts = {
+      answered: touched.size,
+      comments: [...boxes.values()].filter((box) => box.value.trim()).length,
+      remarks: (window.__amRemarkData?.() ?? []).length,
+    };
+    const parts = Object.entries(counts).filter(([, n]) => n > 0).map(([kind, n]) => ui.count[kind].replace('{n}', n));
+    summary.textContent = parts.join(' · ');
+    bar.hidden = !parts.length;
+    document.body.classList.toggle('am-has-reply-bar', parts.length > 0);
+  };
+  document.addEventListener('am-remark-change', () => refreshBar());
+  // Saved remarks are restored by remark.js, which runs after this script in the same <script> element: its data is not there yet.
+  // A microtask runs when that whole element has finished, so the first count includes them.
+  queueMicrotask(() => refreshBar());
+}
+})();
+(() => {
+// Text helpers for remark mode (src/runtime/remark.js): how a marked block is named and quoted.
+// A plain ES module for tests; the page gets it with its `export` keyword dropped (src/runtime/compose.js).
+// A block keeps its mark across `am patch` because the key is its panel, its tag and the start of its text, not its position.
+
+const collapse = (text) => String(text).replace(/\s+/g, ' ').trim();
+
+// The start of a block's text with whitespace collapsed: the readable identity of the block.
+function fingerprint(text, len = 80) {
+  return collapse(text).slice(0, len);
+}
+
+// What the reply quotes of a block: the start of its text, with an ellipsis when it is cut.
+function quote(text, len = 60) {
+  const t = collapse(text);
+  return t.length > len ? `${t.slice(0, len).trimEnd()}…` : t;
+}
+
+// Two blocks with the same text (two identical list items) get the same base key. The n-th one in the page gets "\t<n>" added;
+// a tab cannot be in a fingerprint, which has its whitespace collapsed, so the new key never meets another base key.
+function occurrenceKeys(bases) {
+  const seen = new Map();
+  return bases.map((base) => {
+    const n = seen.get(base) ?? 0;
+    seen.set(base, n + 1);
+    return n ? `${base}\t${n}` : base;
+  });
+}
+
+// Remark mode: the reader turns it on, clicks a block, tags it (suggestion, keep, question, concern) and may add a note.
+// A mark shows as a bar and a note chip inside the block, lives in localStorage like panel comments, and the Reply button carries it
+// back to the agent: reply.js calls window.__amRemarkData, and replyText (reply-text.js) writes the Remarks section.
+(() => {
+  const btn = document.querySelector('[data-am="remark"]');
+  if (!btn) return;
+  const ui = JSON.parse(btn.dataset.ui);
+  const KINDS = ['suggestion', 'keep', 'question', 'concern'];
+  const storeKey = `am-remark:${location.pathname}`;
+  // The one definition of a block a reader can mark: the content under <main>. The page and panel titles are left out, because the
+  // reply reads them as text; a panel has its Comment button.
+  // A $$ block on its own is a div; a $$ formula inside a sentence is a span of its paragraph.
+  const BLOCK = 'main :is(h1,h2,h3,h4,h5,h6,p,li,blockquote,pre,table,dd,dt,figure,div.am-math-block):not(.am-head *, .am-panel-head *, .am-toc *)';
+  // A click on these does what it always did.
+  const LIVE = '.am-remark-pop, .am-toolbar, a, button, input, textarea, select, label';
+  const blockAt = (target) => (target.closest(LIVE) ? null : target.closest(BLOCK));
+
+  const WJ = new RegExp(String.fromCharCode(0x2060), 'g'); // word joiners of a right-to-left page (src/bidi.js); not part of the draft's text
+  // A narrow horizontal timeline shows its date and title inline (src/themes/base.css). They stay parts of their own, so a block key
+  // does not change with the width of the window (#194).
+  const OWN_BOX = '.am-timeline--h .am-tl-when, .am-timeline--h .am-tl-title';
+  const inlineBox = new WeakMap();
+  const isInline = (el) => {
+    if (!inlineBox.has(el)) inlineBox.set(el, !el.matches(OWN_BOX) && getComputedStyle(el).display.startsWith('inline'));
+    return inlineBox.get(el);
+  };
+  // The text of a block as the reader sees it: separate lines, cells and timeline parts are joined by a space (textContent would run
+  // "2026" and "Ship" together), and the note chip is not part of it. A formula is one box and reads as the TeX the draft wrote
+  // (src/runtime/math-text.js), not as the MathML tokens.
+  const blockText = (el) => {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    let text = '';
+    let last = null;
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (node.parentElement.closest('.am-mark-note')) continue;
+      let box = formulaOf(node) ?? node.parentElement;
+      while (box !== el && isInline(box)) box = box.parentElement;
+      if (last && box !== last) text += ' ';
+      text += nodeText(node).replace(WJ, '');
+      last = box;
+    }
+    return text;
+  };
+
+  const panelOf = (el) => el.closest('.am-panel')?.id.replace(/^panel-/, '') ?? '';
+  // Block keys, in page order. Built when first needed: a page nobody marked pays nothing.
+  let keys = null;
+  const keyMap = () => {
+    if (!keys) {
+      const blocks = [...document.querySelectorAll(BLOCK)];
+      const ids = occurrenceKeys(blocks.map((el) => `${panelOf(el)}|${el.localName}|${fingerprint(blockText(el))}`));
+      keys = new Map(blocks.map((el, i) => [el, ids[i]]));
+    }
+    return keys;
+  };
+
+  const load = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(storeKey));
+      return Array.isArray(saved) ? saved.filter((m) => typeof m?.key === 'string' && KINDS.includes(m.kind)) : [];
+    } catch {
+      return [];
+    }
+  };
+  // A mark whose block is gone from the page stays stored (it may return with `am patch`); it is neither painted nor sent.
+  const marks = new Map(load().map((m) => [m.key, { key: m.key, kind: m.kind, note: String(m.note ?? '') }]));
+  // Kind and note of a popover closed without Save, by block key, until the page reloads (see open below).
+  const drafts = new Map();
+  const clearBtn = document.createElement('button');
+  clearBtn.type = 'button';
+  clearBtn.className = 'am-btn am-btn--remark-clear';
+  clearBtn.textContent = ui.clear;
+  // Clear all drops saved marks and drafts, so it shows while either exists.
+  const toClear = () => marks.size + drafts.size;
+  const showClear = () => { clearBtn.hidden = toClear() === 0; };
+  btn.insertAdjacentElement('afterend', clearBtn);
+  let clearTimer = null;
+  let clearArmed = false;
+  const resetClear = () => {
+    if (clearTimer !== null) clearTimeout(clearTimer);
+    clearTimer = null;
+    clearArmed = false;
+    clearBtn.classList.remove('is-armed');
+    clearBtn.textContent = ui.clear;
+    showClear();
+  };
+  const armClear = () => {
+    clearArmed = true;
+    clearBtn.classList.add('is-armed');
+    clearBtn.textContent = ui.clearConfirm.replace('{n}', toClear());
+    clearTimer = setTimeout(resetClear, 4000);
+  };
+  clearBtn.addEventListener('click', () => {
+    if (!clearArmed) {
+      armClear();
+      return;
+    }
+    for (const el of document.querySelectorAll('.am-mark')) unpaint(el);
+    marks.clear();
+    // A draft is a remark the reader has not saved yet; Clear all drops it too, so no block reopens with an old kind.
+    drafts.clear();
+    try {
+      localStorage.removeItem(storeKey);
+    } catch {
+      // Storage may be off (private window, a sandboxed page); the in-memory marks still clear.
+    }
+    resetClear();
+    document.dispatchEvent(new Event('am-remark-change'));
+  });
+  const save = () => {
+    try {
+      localStorage.setItem(storeKey, JSON.stringify([...marks.values()]));
+    } catch {
+      // Storage may be off (private window, a sandboxed page); marks then last until the page closes.
+    }
+    // The reply bar (reply.js) shows the number of marks.
+    document.dispatchEvent(new Event('am-remark-change'));
+    showClear();
+  };
+
+  const chip = (el, mark) => {
+    const note = document.createElement(el.localName === 'table' ? 'caption' : 'span');
+    note.className = 'am-mark-note';
+    const kind = document.createElement('b');
+    kind.textContent = ui.kinds[mark.kind];
+    note.append(kind, mark.note ? ` ${mark.note}` : '');
+    return note;
+  };
+  const clearChip = (el) => el.querySelector(':scope > .am-mark-note')?.remove();
+  const paint = (el, mark) => {
+    clearChip(el);
+    el.classList.add('am-mark');
+    el.dataset.kind = mark.kind;
+    // Inside the block, so a list item stays a child of its list. A table takes it as its caption; a list item with a sub-list shows
+    // it under its own text, before the sub-list.
+    const sub = el.querySelector(':scope > ul, :scope > ol');
+    if (el.localName === 'table') el.prepend(chip(el, mark));
+    else if (sub) sub.before(chip(el, mark));
+    else el.append(chip(el, mark));
+  };
+  const unpaint = (el) => {
+    clearChip(el);
+    el.classList.remove('am-mark');
+    delete el.dataset.kind;
+  };
+  showClear();
+  if (marks.size) for (const [el, key] of keyMap()) if (marks.has(key)) paint(el, marks.get(key));
+
+  // The popover edits one block. Save stays off until a kind is picked, and a hint says so. 1–4 pick a kind from the keyboard and
+  // move to the note; Ctrl / Cmd + Enter saves. A popover closed without Save keeps its kind and note as a draft for that block until the page reloads.
+  const pop = document.createElement('div');
+  pop.className = 'am-remark-pop';
+  pop.hidden = true;
+  pop.setAttribute('role', 'dialog');
+  pop.setAttribute('aria-label', ui.button);
+  document.body.append(pop);
+  let opener = null;
+  let anchor = null;
+  let keepDraft = null;
+  const close = (restoreFocus) => {
+    if (pop.hidden) return;
+    keepDraft?.();
+    keepDraft = null;
+    pop.hidden = true;
+    if (restoreFocus) (opener?.isConnected && opener !== document.body ? opener : btn).focus();
+  };
+  const place = () => {
+    const rect = anchor.getBoundingClientRect();
+    const rtl = getComputedStyle(document.documentElement).direction === 'rtl';
+    const x = rtl ? rect.right - pop.offsetWidth : rect.left;
+    // Under the block; a block taller than the window gets the popover at the bottom of the window instead.
+    const y = Math.min(rect.bottom + 6, window.innerHeight - pop.offsetHeight - 8);
+    pop.style.left = `${window.scrollX + Math.min(Math.max(8, x), window.innerWidth - pop.offsetWidth - 8)}px`;
+    pop.style.top = `${window.scrollY + Math.max(8, y)}px`;
+  };
+  const make = (tag, props) => Object.assign(document.createElement(tag), props);
+  const open = (el) => {
+    const key = keyMap().get(el);
+    const mark = marks.get(key);
+    const draft = drafts.get(key);
+    let kind = draft?.kind ?? mark?.kind ?? '';
+    opener = document.activeElement;
+    anchor = el;
+
+    const note = make('textarea', { rows: 2, placeholder: ui.hint, value: draft?.note ?? mark?.note ?? '' });
+    note.setAttribute('aria-label', ui.hint);
+    const keep = make('button', { type: 'button', className: 'am-btn', textContent: ui.save, disabled: !kind });
+    const need = make('span', { className: 'am-remark-need', textContent: ui.need, hidden: Boolean(kind) });
+    keepDraft = () => {
+      if (kind || note.value.trim()) drafts.set(key, { kind, note: note.value });
+      else drafts.delete(key);
+      showClear();
+    };
+    const done = () => { drafts.delete(key); keepDraft = null; showClear(); };
+    keep.addEventListener('click', () => {
+      done();
+      const saved = { key, kind, note: note.value.trim() };
+      marks.set(key, saved);
+      save();
+      paint(el, saved);
+      close(true);
+    });
+    const actions = make('div', { className: 'am-remark-actions' });
+    actions.append(keep);
+    if (mark) {
+      const drop = make('button', { type: 'button', className: 'am-btn', textContent: ui.remove });
+      drop.addEventListener('click', () => {
+        done();
+        marks.delete(key);
+        save();
+        unpaint(el);
+        close(true);
+      });
+      actions.append(drop);
+    }
+    const choose = (k) => {
+      kind = k;
+      for (const other of kindBtns) other.setAttribute('aria-pressed', String(other.dataset.kind === k));
+      keep.disabled = false;
+      need.hidden = true;
+    };
+    const kindBtns = KINDS.map((k, i) => {
+      const kb = make('button', { type: 'button', className: 'am-remark-kind', textContent: ui.kinds[k] });
+      kb.dataset.kind = k;
+      kb.dataset.n = i + 1;
+      kb.setAttribute('aria-pressed', String(k === kind));
+      kb.addEventListener('click', () => choose(k));
+      return kb;
+    });
+    // Ctrl / Cmd + Enter presses Save (nothing while Save waits for a kind). A digit types into the note, so it picks a kind
+    // only while the focus is outside the note.
+    pop.onkeydown = (e) => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !e.isComposing) {
+        e.preventDefault();
+        if (!keep.disabled) keep.click();
+        return;
+      }
+      if (e.target === note || e.ctrlKey || e.metaKey || e.altKey || !/^[1-4]$/.test(e.key)) return;
+      e.preventDefault();
+      choose(KINDS[Number(e.key) - 1]);
+      note.focus();
+    };
+    actions.append(need);
+    pop.replaceChildren(make('div', { className: 'am-remark-kinds' }), note, actions);
+    pop.firstChild.append(...kindBtns);
+    pop.hidden = false;
+    place();
+    (kindBtns.find((b) => b.dataset.kind === kind) ?? kindBtns[0]).focus({ preventScroll: true });
+  };
+
+  // Picking works only while remark mode is on. A click on a marked block edits its mark, on a plain block starts one.
+  // The block under the pointer gets an outline: the same blockAt decides what is outlined and what a click picks.
+  let hover = null;
+  const track = (e) => {
+    const el = e.type === 'mouseout' && e.relatedTarget === null ? null : blockAt(e.target);
+    if (el === hover) return;
+    hover?.classList.remove('am-remark-hover');
+    hover = el;
+    hover?.classList.add('am-remark-hover');
+  };
+  const pick = (e) => {
+    const el = blockAt(e.target);
+    if (el) open(el);
+  };
+  // The keyboard picks too: while the mode is on, every block takes focus with Tab, and Enter or Space opens its popover. A block
+  // that already had a tabindex keeps it; only the ones the mode added lose it again.
+  const pickKey = (e) => {
+    if ((e.key !== 'Enter' && e.key !== ' ') || e.ctrlKey || e.metaKey || e.altKey || !e.target.hasAttribute?.('data-am-pick')) return;
+    e.preventDefault();
+    open(e.target);
+  };
+  const focusable = (on) => {
+    if (!on && !keys) return; // the mode starts off: a page nobody marked builds no block keys
+    for (const el of keyMap().keys()) {
+      if (on && !el.hasAttribute('tabindex')) {
+        el.tabIndex = 0;
+        el.setAttribute('data-am-pick', '');
+      } else if (!on && el.hasAttribute('data-am-pick')) {
+        el.removeAttribute('tabindex');
+        el.removeAttribute('data-am-pick');
+      }
+    }
+  };
+  const setMode = (on) => {
+    btn.classList.toggle('is-on', on);
+    btn.setAttribute('aria-pressed', String(on));
+    const toggle = on ? 'addEventListener' : 'removeEventListener';
+    document.body[toggle]('click', pick);
+    document.body[toggle]('mouseover', track);
+    document.body[toggle]('mouseout', track);
+    document.body[toggle]('keydown', pickKey);
+    focusable(on);
+    if (!on) {
+      track({ type: 'mouseout', relatedTarget: null });
+      close(false);
+    }
+  };
+  btn.addEventListener('click', () => setMode(btn.getAttribute('aria-pressed') !== 'true'));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') close(true);
+  });
+  // A click outside the popover closes it; the same click may then start another mark.
+  document.addEventListener('click', (e) => {
+    if (!pop.hidden && !pop.contains(e.target)) close(false);
+  }, true);
+  setMode(false);
+
+  // What the Reply button reads: the marked blocks that are on the page, in page order.
+  window.__amRemarkData = () => {
+    if (!marks.size) return [];
+    const live = [];
+    for (const [el, key] of keyMap()) {
+      const mark = marks.get(key);
+      if (mark) live.push({ panel: panelOf(el), quote: quote(blockText(el)), kind: mark.kind, note: mark.note });
+    }
+    return live;
+  };
+})();
+})();
+(() => {
+// Pure planner for justified ("photo wall") rows on sheet pages. No DOM access.
+//
+// This file must stay inlinable into the page script: top-level declarations only, no imports, and the exports are
+// `planLayout` and the constants the DOM adapter shares (STEP, MAX_SCALE, MIN_SCALE). The page build strips the `export ` keyword,
+// and test/layout-plan.test.js checks that this still works.
+//
+// planLayout({ width, gap, cols, panels }) -> { rows: [{ columns: [{ panels: [index, ...], width }], height }] }
+//
+// Input (all lengths in px):
+//   width   container width
+//   gap     space between columns, and between two panels stacked in one column
+//   cols    most columns in one row (the planner never uses more than MAX_COLUMNS, but spans stay shares of `cols`)
+//   panels  one entry per panel, in reading order:
+//     samples   [{ w, h }] panel height at sampled widths, ascending by w (heights between samples are interpolated)
+//     minWidth  narrowest feasible width (clamped to `width`)
+//     maxWidth  widest useful width; beyond it the panel only gains empty space (default: no limit)
+//     natural   natural diagram width for a diagram-only panel (default: none)
+//     pad       panel width not used by the diagram (padding and border; default 0)
+//     span      the author's width hint in grid columns (default 1); span >= cols keeps the panel alone in its row
+//
+// Output: { rows, maxScale }. Rows are in reading order; a row is a list of columns (at most `cols`); a column holds one panel or two
+// consecutive panels, stacked. For integer inputs the column widths plus the gaps between them equal `width`.
+// Rows are chosen by dynamic programming over break points; widths by a search in STEP px steps. Cost per row:
+//   H = tallest column; waste = sum((H - columnHeight) * columnWidth) + sum over diagrams wider than maxWidth of (w - maxWidth) * h
+//   dev = sum(((w - preferred) / oneColumn)^2) + SCALE_WEIGHT * sum over diagrams of (ln(scale) / ln(MAX_SCALE))^2
+//   cost = waste / 1000 + PREF_WEIGHT * dev * H
+// Scale band: diagrams on one page stay at similar sizes. With the result's `maxScale` as the diagram size limit, a diagram is
+// shown at scale min(maxScale, (width - pad) / natural). The planner tries a few bands [lo, lo * BAND_RATIO] (lo in BAND_LOS) and
+// keeps the cheapest plan in which no diagram is narrower than scale lo and none is shown above the band's top, so the largest and
+// smallest diagram scale on the page differ by at most BAND_RATIO. A panel wider than its diagram's top size keeps the diagram at
+// that size, and the page script must set the diagram's max-width to natural * maxScale. The band starts no higher than the
+// largest scale the page allows the least roomy diagram, so one wide diagram lowers the band for the others.
+// If no band is feasible the plan is made without a band (maxScale = MAX_SCALE); if no plan fits (or the input is unusable) the
+// result is a single column: one panel per row at the full width.
+
+const STEP = 10;
+const MAX_SCALE = 1.25;
+const MIN_SCALE = 0.75; // the narrowest a diagram is shown, as a share of its natural width
+const MAX_COLUMNS = 6; // rows with more columns are unreadable, and the search grows steeply with the column count
+const BAND_RATIO = 1.25; // the largest and smallest diagram scale on a page differ by at most this
+const BAND_LOS = [MIN_SCALE, 0.85, 0.95, 1]; // lower ends tried for the band; lo * BAND_RATIO is the upper end (1.25 means no upper limit)
+const SCALE_WEIGHT = 3;
+const PREF_WEIGHT = 0.15;
+
+function heightAt(samples, w) {
+  const i = samples.findIndex((s) => s.w >= w);
+  if (i === -1) return samples[samples.length - 1].h;
+  if (i === 0) return samples[0].h;
+  const a = samples[i - 1];
+  const b = samples[i];
+  return a.h + ((b.h - a.h) * (w - a.w)) / (b.w - a.w);
+}
+
+// Every way to split `len` consecutive panels into columns of 1 or 2 panels, as lists of column sizes.
+function splits(len) {
+  if (len === 0) return [[]];
+  return [1, 2].filter((k) => k <= len).flatMap((k) => splits(len - k).map((rest) => [k, ...rest]));
+}
+
+function singleColumn(width, panels) {
+  return { rows: panels.map((_, i) => ({ columns: [{ panels: [i], width }], height: 0 })) };
+}
+
+function planLayout({ width, gap = 0, cols = 3, panels }) {
+  const usable = Number.isFinite(width) && width > 0 && panels.every((p) => Array.isArray(p.samples) && p.samples.length > 0);
+  if (!usable) return singleColumn(width, panels);
+
+  // `cols` stays the unit of the author's spans; no row gets more than MAX_COLUMNS columns however large `cols` is.
+  const maxColumns = Math.min(cols, MAX_COLUMNS);
+  const oneColumn = Math.max(1, (width - gap * (cols - 1)) / cols);
+  // Per-panel limits. With a band [lo, lo * BAND_RATIO], a diagram is no narrower than scale lo and shown at most at the top of the
+  // band: a wider panel keeps it at that size and gains empty space, which the cost counts as waste.
+  const prepare = (lo) => panels.map((p) => {
+    const pad = p.pad ?? 0;
+    const diagram = lo > 0 && p.natural > 0;
+    const scaleCap = diagram ? Math.min(MAX_SCALE, lo * BAND_RATIO) : MAX_SCALE;
+    return {
+      ...p,
+      minWidth: Math.min(width, Math.max(Math.ceil(p.minWidth || 0), diagram ? Math.ceil(p.natural * lo + pad) : 0)),
+      maxWidth: Math.min(p.maxWidth ?? Infinity, diagram ? p.natural * scaleCap + pad : Infinity),
+      scaleCap,
+      pad,
+      preferred: Math.min(width, (p.span ?? 1) * oneColumn + ((p.span ?? 1) - 1) * gap),
+      alone: (p.span ?? 1) >= cols,
+    };
+  });
+  let info = prepare(0);
+  // Beyond its maxWidth a panel only gains empty space, so its height stops changing there (matters when a band lowers maxWidth).
+  const heightOf = (p, w) => heightAt(p.samples, Math.min(w, p.maxWidth));
+  const columnHeight = (col, w) => col.reduce((h, k) => h + heightOf(info[k], w), 0) + gap * (col.length - 1);
+
+  function bestColumns(columns) {
+    const avail = width - gap * (columns.length - 1);
+    const mins = columns.map((c) => Math.max(...c.map((k) => info[k].minWidth)));
+    const minsFrom = mins.map((_, n) => mins.slice(n).reduce((s, w) => s + w, 0));
+    if (minsFrom[0] > avail) return null;
+    let best = null;
+    const evaluate = (ws) => {
+      const hs = ws.map((w, n) => columnHeight(columns[n], w));
+      const H = Math.max(...hs);
+      let waste = 0;
+      let dev = 0;
+      ws.forEach((w, n) => {
+        waste += (H - hs[n]) * w;
+        for (const k of columns[n]) {
+          const p = info[k];
+          if (w > p.maxWidth) waste += (w - p.maxWidth) * heightOf(p, w);
+          dev += ((w - p.preferred) / oneColumn) ** 2;
+          if (p.natural > 0) {
+            const scale = Math.min(p.scaleCap, Math.max(w - p.pad, 1) / p.natural);
+            dev += SCALE_WEIGHT * (Math.log(scale) / Math.log(MAX_SCALE)) ** 2;
+          }
+        }
+      });
+      const cost = waste / 1000 + PREF_WEIGHT * dev * H;
+      if (!best || cost < best.cost) best = { cost, ws, height: H, columns };
+    };
+    const choose = (n, used, ws) => {
+      if (n === columns.length - 1) {
+        const w = avail - used;
+        if (w >= mins[n]) evaluate([...ws, w]);
+        return;
+      }
+      for (let w = mins[n]; used + w + minsFrom[n + 1] <= avail; w += STEP) choose(n + 1, used + w, [...ws, w]);
+    };
+    choose(0, 0, []);
+    return best;
+  }
+
+  // Best columns for one row of panels i..j.
+  function bestRow(i, j) {
+    if (j > i && info.slice(i, j + 1).some((p) => p.alone)) return null;
+    let best = null;
+    for (const split of splits(j - i + 1)) {
+      if (split.length > maxColumns) continue;
+      let next = i;
+      const columns = split.map((size) => Array.from({ length: size }, () => next++));
+      const r = bestColumns(columns);
+      if (r && (!best || r.cost < best.cost)) best = r;
+    }
+    return best;
+  }
+
+  // Row breaks in reading order, for the band set up in `info`. A row holds at most 2 * maxColumns panels. Null if nothing fits.
+  function solve() {
+    const n = panels.length;
+    const total = Array(n + 1).fill(Infinity);
+    const from = Array(n + 1).fill(-1);
+    const chosen = Array(n + 1).fill(null);
+    total[0] = 0;
+    for (let j = 1; j <= n; j++) {
+      for (let i = Math.max(0, j - 2 * maxColumns); i < j; i++) {
+        if (total[i] === Infinity) continue;
+        const r = bestRow(i, j - 1);
+        if (r && total[i] + r.cost < total[j]) {
+          total[j] = total[i] + r.cost;
+          from[j] = i;
+          chosen[j] = r;
+        }
+      }
+    }
+    if (total[n] === Infinity) return null;
+    const rows = [];
+    for (let j = n; j > 0; j = from[j]) {
+      const r = chosen[j];
+      rows.unshift({ columns: r.columns.map((panelsInColumn, c) => ({ panels: panelsInColumn, width: r.ws[c] })), height: r.height });
+    }
+    return { rows, cost: total[n] };
+  }
+
+  let best = null;
+  const diagrams = panels.filter((p) => p.natural > 0);
+  if (diagrams.length > 1) {
+    // No diagram can be shown larger than the page allows, so the band cannot start above the smallest of those limits.
+    const reach = Math.min(...diagrams.map((p) => Math.min(MAX_SCALE, Math.max(width - (p.pad ?? 0), 1) / p.natural)));
+    for (const lo of new Set([...BAND_LOS.filter((x) => x < reach), reach])) {
+      info = prepare(lo);
+      const r = solve();
+      if (r && (!best || r.cost < best.cost)) best = { ...r, maxScale: Math.min(MAX_SCALE, lo * BAND_RATIO) };
+    }
+    info = prepare(0);
+  }
+  best ??= solve();
+  return best ? { rows: best.rows, maxScale: best.maxScale ?? MAX_SCALE } : singleColumn(width, panels);
+}
+
+// DOM adapter for the sheet's justified ("photo wall") layout. Not a module: compose.js puts it after src/runtime/layout-plan.js
+// (which defines planLayout and the shared STEP, MAX_SCALE, MIN_SCALE) inside one function scope of the page script.
+//
+// It measures every panel at sampled widths, asks planLayout for rows and column widths, and applies them with flexbox.
+// The rendered HTML keeps the plain CSS grid: with JavaScript off, at the single-column breakpoint, or while printing, the grid is what
+// shows (the planned widths belong to the screen width, so print never gets a mix of the two); after printing the layout comes back.
+
+const grid = document.querySelector('.am-grid');
+const panels = grid ? [...grid.children].filter((el) => el.classList.contains('am-panel')) : [];
+
+if (panels.length > 1) {
+  const SINGLE_COLUMN = '(max-width: 760px)'; // the single-column breakpoint in src/themes/base.css
+  const TWO_COLUMNS = '(max-width: 1100px)'; // below this the CSS grid has two columns
+  const SAMPLE_STEP = 20; // width sampling step, px; the planner interpolates between samples
+  // The width floors are text sizes (px at scale 1). They take the page scale on every pass, so a runtime change of --am-scale re-plans.
+  const TEXT_MIN = 260; // text keeps at least about 16 CJK characters per line
+  const TABLE_COL_MIN = 96; // per table column, px
+  const TABLE_COL_COMFORT = 220; // a table column this wide reads three or four words per line
+  const KV_COL_MIN = 120; // per key-value column, px: a value of two short words stays on one line
+  const DIAGRAM_MIN = 160;
+  const RESIZE_DELAY = 150;
+  const pageScale = () => {
+    const scale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--am-scale'));
+    return Number.isFinite(scale) && scale > 0 ? scale : 1;
+  };
+  const OVERFLOWING = '.am-table-wrap, .am-diagram, .am-annot-scroll, pre';
+
+  // The first-row cells of each table carry the column widths fitTables() sets, so restore() resets them too.
+  const tables = [...grid.querySelectorAll('.am-table-wrap > table')];
+  const headCells = (table) => [...(table.rows[0]?.cells ?? [])];
+  const original = new Map([grid, ...panels, ...grid.querySelectorAll('.am-diagram > svg'), ...tables.flatMap(headCells)].map((el) => [el, el.getAttribute('style')]));
+  const restoreStyle = (el) => (original.get(el) === null ? el.removeAttribute('style') : el.setAttribute('style', original.get(el)));
+
+  // Back to the plain grid markup and styles.
+  const restore = () => {
+    for (const box of grid.querySelectorAll(':scope > .am-col')) box.replaceWith(...box.children);
+    for (const el of original.keys()) restoreStyle(el);
+  };
+
+  // The author's width hint, rendered as data-span only when the author wrote one. The inline grid-column is the no-JavaScript fallback
+  // and may hold spans the server added, so it is never read here.
+  const spanHint = (el) => Number(el.dataset.span) || 1;
+  const diagramOnly = (el) => {
+    const body = el.querySelector(':scope > .am-panel-body');
+    return body && body.children.length === 1 ? body.querySelector(':scope > .am-diagram > svg') : null;
+  };
+  const naturalWidth = (svg) => Number(svg.getAttribute('width')) || 0;
+
+  // The width each column of a table reads well at: its natural width, but no wider than TABLE_COL_COMFORT unless its longest word
+  // needs more. Below it the cells wrap one word per line, so a panel with a table is not planned narrower than the sum, and
+  // fitTables() keeps each column at its share (the browser would otherwise give the room to the longest column).
+  const columnWidths = new Map();
+  function comfortableWidth(table, scale) {
+    const saved = table.getAttribute('style');
+    const columns = (width) => {
+      table.style.width = width;
+      return headCells(table).map((cell) => cell.getBoundingClientRect().width);
+    };
+    const most = columns('max-content');
+    const least = columns('min-content');
+    if (saved === null) table.removeAttribute('style');
+    else table.setAttribute('style', saved);
+    // A max-content column comes out a fraction under its text in Chrome, enough to wrap the last word, so it gets one pixel more.
+    const want = most.map((w, i) => Math.min(Math.ceil(w) + 1, Math.max(least[i], TABLE_COL_COMFORT * scale)));
+    columnWidths.set(table, { least, want });
+    return want.reduce((sum, w) => sum + w, 0);
+  }
+
+  // After the layout: each column gets at least its comfortable width, scaled down toward its longest word when the panel came out
+  // narrower than planned (a page narrower than the table), so a table scrolls sideways only when even its longest words do not fit.
+  function fitTables() {
+    for (const [table, { least, want }] of columnWidths) {
+      // Each width is rounded up to a whole pixel (a column a fraction too narrow wraps its last word), so keep a pixel per column spare.
+      const room = table.parentElement.clientWidth - want.length;
+      const low = least.reduce((s, w) => s + w, 0);
+      const high = want.reduce((s, w) => s + w, 0);
+      const k = high > room ? Math.max(0, (room - low) / (high - low || 1)) : 1;
+      headCells(table).forEach((cell, i) => { cell.style.minWidth = `${Math.ceil(least[i] + (want[i] - least[i]) * k)}px`; });
+    }
+  }
+
+  // Height (and, for panels with tables or code, the narrowest width without sideways scrolling) at sampled widths.
+  // Only one panel is displayed while it is measured, so each width change lays out that panel alone.
+  function measure(width) {
+    const scale = pageScale();
+    grid.style.display = 'block';
+    for (const el of panels) {
+      el.style.display = 'none';
+      el.style.boxSizing = 'border-box';
+      for (const svg of el.querySelectorAll('.am-diagram > svg')) {
+        svg.style.width = '100%';
+        svg.style.maxWidth = `${naturalWidth(svg) * MAX_SCALE}px`;
+      }
+    }
+    const info = panels.map((el) => {
+      const svg = diagramOnly(el);
+      const svgs = [...el.querySelectorAll('.am-diagram > svg')];
+      const scrollers = el.querySelectorAll(OVERFLOWING);
+      const tableCols = Math.max(0, ...[...el.querySelectorAll('table tr:first-child')].map((tr) => tr.children.length));
+      el.style.display = '';
+      el.style.width = `${width}px`;
+      const pad = svg ? el.offsetWidth - svg.parentElement.clientWidth : 0;
+      const natural = svg ? naturalWidth(svg) : 0;
+      const shrunk = Math.max(0, ...svgs.map((s) => naturalWidth(s) * MIN_SCALE)) + (svg ? pad : 34);
+      const tableFloors = [...el.querySelectorAll('.am-table-wrap > table')].map((t) => comfortableWidth(t, scale) + el.offsetWidth - t.parentElement.clientWidth);
+      // A key-value grid gets the same care: the room a table gains must not squeeze a neighbouring grid to one word per line.
+      const kvs = [...el.querySelectorAll('.am-kv')].map((kv) => (Number(kv.style.getPropertyValue('--kv-cols')) || 1) * KV_COL_MIN * scale + el.offsetWidth - kv.clientWidth);
+      const floor = svg ? Math.max(DIAGRAM_MIN * scale, natural * MIN_SCALE + pad) : Math.max(TEXT_MIN * scale, shrunk, tableCols * TABLE_COL_MIN * scale + 34, ...tableFloors, ...kvs);
+      const from = Math.min(width, Math.floor(floor / STEP) * STEP);
+      const samples = [];
+      let fits = null;
+      for (let w = from; ; w += SAMPLE_STEP) {
+        w = Math.min(w, width);
+        el.style.width = `${w}px`;
+        if (fits === null && !svg && scrollers.length && ![...scrollers].some((s) => s.scrollWidth > s.clientWidth + 1)) fits = w;
+        samples.push({ w, h: el.offsetHeight });
+        if (w === width) break;
+      }
+      el.style.display = 'none';
+      return {
+        samples,
+        minWidth: svg ? floor : Math.max(floor, fits ?? (scrollers.length ? width : 0)),
+        maxWidth: svg ? natural * MAX_SCALE + pad : Infinity,
+        natural,
+        pad,
+        span: spanHint(el),
+      };
+    });
+    for (const el of panels) {
+      el.style.display = '';
+      el.style.width = '';
+    }
+    return info;
+  }
+
+  // Each column gets a fixed width. A row adds up to the full width, so flex-wrap breaks rows by itself.
+  // Stacked panels go into a column wrapper whose last panel absorbs the extra height.
+  function apply(plan, gap) {
+    grid.style.display = 'flex';
+    grid.style.flexWrap = 'wrap';
+    grid.style.alignItems = 'stretch';
+    grid.style.gap = `${gap}px`;
+    for (const el of panels) {
+      el.style.gridColumn = '';
+      el.style.gridRow = '';
+      el.style.flex = '0 0 auto';
+    }
+    for (const row of plan.rows) {
+      for (const col of row.columns) {
+        const width = `${col.width}px`;
+        if (col.panels.length === 1) {
+          panels[col.panels[0]].style.width = width;
+          continue;
+        }
+        const box = document.createElement('div');
+        box.className = 'am-col';
+        box.style.cssText = `width:${width};flex:0 0 auto;display:flex;flex-direction:column;gap:${gap}px`;
+        panels[col.panels[0]].before(box);
+        for (const k of col.panels) {
+          panels[k].style.width = '';
+          box.append(panels[k]);
+        }
+        panels[col.panels[col.panels.length - 1]].style.flex = '1 1 auto';
+      }
+    }
+  }
+
+  // Diagram-only panels show their diagram at most at the top of the page's scale band; a wider panel gains empty space instead.
+  function capDiagrams(maxScale) {
+    for (const el of panels) {
+      const svg = diagramOnly(el);
+      if (svg) svg.style.maxWidth = `${naturalWidth(svg) * maxScale}px`;
+    }
+  }
+
+  const containerWidth = () => Math.floor(grid.getBoundingClientRect().width);
+
+  function justify() {
+    if (printing || printQuery.matches) return;
+    try {
+      // A vertical scrollbar can appear or vanish once the rows change height; plan again if the width moved.
+      let planned = -1;
+      for (let pass = 0; pass < 3 && planned !== containerWidth(); pass++) {
+        restore();
+        if (matchMedia(SINGLE_COLUMN).matches) return;
+        planned = containerWidth();
+        const gap = parseFloat(getComputedStyle(grid).columnGap) || 0;
+        const cols = Math.max(1, Number(getComputedStyle(grid).getPropertyValue('--cols')) || 3);
+        const plan = planLayout({ width: planned, gap, cols: matchMedia(TWO_COLUMNS).matches ? Math.min(cols, 2) : cols, panels: measure(planned) });
+        apply(plan, gap);
+        capDiagrams(plan.maxScale);
+        fitTables();
+      }
+      // The width never settled: columns planned for another width would overflow or leave gaps, so show the plain grid.
+      if (planned !== containerWidth()) restore();
+    } catch {
+      restore();
+    }
+  }
+
+  // Printing: back to the plain grid (spans and all), and the layout again afterwards. Browsers disagree on which of the
+  // `beforeprint` event and the print media query change fires first, or at all, so listen to both; both are idempotent.
+  // While `printing` is set (beforeprint to afterprint) justify() does nothing, so a late resize cannot bring flex widths into the print layout.
+  let printing = false;
+  const printQuery = matchMedia('print');
+  let timer = 0;
+  const later = () => {
+    clearTimeout(timer);
+    timer = setTimeout(justify, RESIZE_DELAY);
+  };
+  const toPrint = () => {
+    clearTimeout(timer);
+    restore();
+  };
+  justify();
+  addEventListener('resize', later);
+  // A reader's text size changes every panel's text widths and heights, so the sheet is planned again like a resize.
+  addEventListener('am-scale', later);
+  addEventListener('beforeprint', () => {
+    printing = true;
+    toPrint();
+  });
+  addEventListener('afterprint', () => {
+    printing = false;
+    later();
+  });
+  printQuery.addEventListener('change', (e) => (e.matches ? toPrint() : later()));
+  // Late changes to panel heights: web fonts arriving, and images inside the grid finishing their load (load does not bubble, so capture it).
+  document.fonts?.ready.then(later);
+  grid.addEventListener('load', later, true);
+  // Switching theme changes paddings and fonts, hence panel heights.
+  document.querySelector('[data-am="theme"]')?.addEventListener('click', later);
+}
+})();
+// The outline rail of a doc page (src/templates/doc.js): the markup already works without a script, <details> opens the list and the
+// links jump. This adds the hover dwell, the open direction, the keys, the tap outside and the marking of the current section.
+(() => {
+  const nav = document.querySelector('nav.am-toc');
+  const box = nav && nav.querySelector('details.am-outline');
+  if (!box) return;
+  const sum = box.querySelector('summary');
+  const links = Array.from(box.querySelectorAll('.am-outline-list a'));
+  const ticks = Array.from(box.querySelectorAll('.am-tick'));
+  const LIST_W = 240; // keep in step with .am-outline-list in src/themes/base.css
+  const EDGE = 10; // the 6px gap to the rail plus a margin to the viewport edge
+  let current = '';
+  let byHover = false;
+  let dwell = 0;
+  let leave = 0;
+
+  // Open away from the body when the room outside the rail fits the list; otherwise over the body. Never past the viewport.
+  const place = () => {
+    const r = sum.getBoundingClientRect();
+    const right = r.left + r.width / 2 > innerWidth / 2;
+    const room = right ? innerWidth - r.right : r.left;
+    nav.dataset.flow = room >= Math.min(LIST_W, innerWidth - 48) + EDGE ? 'out' : 'in';
+  };
+  const setOpen = (open) => {
+    if (open) place();
+    box.open = open;
+    if (!open) byHover = false;
+  };
+  const peek = (tick) => ticks.forEach((t) => t.classList.toggle('is-peek', t === tick));
+  const currentLink = () => links.find((a) => a.getAttribute('aria-current') === 'true') || links[0];
+
+  const mark = (id) => {
+    current = id;
+    ticks.forEach((t) => t.classList.toggle('is-current', t.dataset.id === id));
+    links.forEach((a) => {
+      if (a.getAttribute('href') === `#panel-${id}`) a.setAttribute('aria-current', 'true');
+      else a.removeAttribute('aria-current');
+    });
+  };
+  const sections = ticks.map((t) => document.getElementById(`panel-${t.dataset.id}`)).filter(Boolean);
+  if (sections.length) mark(sections[0].id.slice(6));
+  if (sections.length && 'IntersectionObserver' in window) {
+    // A thin band a third of the way down the viewport: the section across it is the one being read.
+    const seen = new Set();
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => (e.isIntersecting ? seen.add(e.target) : seen.delete(e.target)));
+      const hit = sections.filter((s) => seen.has(s)).pop();
+      if (hit && hit.id.slice(6) !== current) mark(hit.id.slice(6));
+    }, { rootMargin: '-30% 0px -65% 0px' });
+    sections.forEach((s) => io.observe(s));
+  }
+
+  place();
+  addEventListener('resize', place);
+
+  // Mouse: dwelling on the rail opens the list, leaving it closes a list opened that way. A tap or click opens it for good.
+  box.addEventListener('pointerenter', (e) => {
+    clearTimeout(leave);
+    if (e.pointerType !== 'mouse' || box.open) return;
+    dwell = setTimeout(() => { setOpen(true); byHover = true; }, 300);
+  });
+  box.addEventListener('pointerleave', () => {
+    clearTimeout(dwell);
+    // A link the keyboard moved into keeps the list open; focusout closes it once the focus leaves the nav.
+    if (byHover) leave = setTimeout(() => { if (!nav.contains(document.activeElement)) setOpen(false); }, 250);
+  });
+  sum.addEventListener('click', (e) => {
+    clearTimeout(dwell);
+    if (box.open && byHover) { e.preventDefault(); byHover = false; return; }
+    place();
+  });
+  box.addEventListener('toggle', () => { if (box.open) peek(null); });
+
+  // Keyboard: the summary opens with Enter or Space (native); arrows move through the links; Esc closes and returns to the rail.
+  sum.addEventListener('focus', () => {
+    if (sum.matches(':focus-visible')) peek(ticks.find((t) => t.dataset.id === current));
+  });
+  sum.addEventListener('blur', () => peek(null));
+  nav.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && box.open) {
+      e.preventDefault();
+      setOpen(false);
+      sum.focus();
+      return;
+    }
+    if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) return;
+    const at = links.indexOf(document.activeElement);
+    if (at < 0 && e.target !== sum) return;
+    e.preventDefault();
+    if (!box.open) setOpen(true);
+    let next;
+    if (e.key === 'Home') next = links[0];
+    else if (e.key === 'End') next = links[links.length - 1];
+    else if (at < 0) next = e.key === 'ArrowDown' ? currentLink() : links[links.length - 1];
+    else next = links[Math.min(links.length - 1, Math.max(0, at + (e.key === 'ArrowDown' ? 1 : -1)))];
+    next.focus();
+  });
+  nav.addEventListener('focusout', (e) => {
+    if (box.open && e.relatedTarget && !nav.contains(e.relatedTarget)) setOpen(false);
+  });
+
+  // Choosing a section or tapping outside closes the list.
+  links.forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('pointerdown', (e) => { if (box.open && !nav.contains(e.target)) setOpen(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && box.open && !nav.contains(e.target)) setOpen(false); });
+})();
+})();
+</script>
+</body>
+</html>

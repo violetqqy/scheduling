@@ -1,18 +1,20 @@
 export type Category = '早' | '中' | '晚' | '白' | '光子'
-export type CellKind = 'shift' | 'overtime' | 'rest' | 'vacation' | 'leave' | 'unassigned'
+export type CellKind = 'shift' | 'custom' | 'overtime' | 'rest' | 'vacation' | 'leave' | 'unassigned'
 export type Page = 'overview' | 'schedule' | 'employees' | 'shifts' | 'calendar' | 'import' | 'statistics' | 'settings'
 export interface Employee { id: string; code: string; name: string; order: number; from: string; to: string; note: string }
 export interface Room { id: string; name: string; color: string; ink: string }
 export interface Shift { id: string; roomId: string; category: Category; enabled: boolean }
-export interface OvertimeBase { kind: 'rest' | 'vacation' | 'unassigned'; locked: boolean; source: 'auto' | 'manual' | 'import' | 'calendar' | 'plan'; note?: string; planId?: string }
-export interface Cell { kind: CellKind; shiftId?: string; locked: boolean; source: 'auto' | 'manual' | 'import' | 'calendar' | 'plan'; note?: string; planId?: string; overtimeBase?: OvertimeBase }
-export interface RuleSettings { photonCarry: 'conflict' | 'continue'; leaveSplits: boolean }
+export interface OvertimeBase { kind: Exclude<CellKind,'overtime'>; shiftId?:string; customName?:string; locked: boolean; source: 'auto' | 'manual' | 'import' | 'calendar' | 'plan'; note?: string; planId?: string }
+export interface Cell { kind: CellKind; shiftId?: string; customName?: string; locked: boolean; source: 'auto' | 'manual' | 'import' | 'calendar' | 'plan'; note?: string; planId?: string; overtimeBase?: OvertimeBase }
+export interface RuleSettings { photonCarry: 'conflict' | 'continue'; leaveSplits: boolean; redYellowOrder?: boolean; monthlyRoomDiversity?: boolean; earlyLatePriority?: boolean; earlyLateCarry?: boolean; singleDayCredit?: boolean }
 export interface Issue { id: string; rule: string; level: 'error' | 'warning'; message: string; date?: string; employeeId?: string; shiftId?: string }
+export interface VacationImpact { employeeId: string; date: string; shiftId: string; segmentDates: string[] }
+export interface SegmentBaseline { employeeId: string; start: string; dates: string[]; shiftId: string; excludedDates?:string[] }
 export interface Version {
   id: string; month: string; name: string; status: 'draft' | 'confirmed' | 'imported';
   created: string; updated: string; cells: Record<string, Cell>; calendar: Record<string, boolean>; requirements: Record<string, number>;
   employeeIds: string[]; ruleSettings: RuleSettings; inputHash: string; sourceVersionId?: string; historyMode?: 'initial' | 'reference';
-  vacationPlans: VacationPlan[]; parentId?: string; demo?: boolean; run?: { attempts: number; duration: number; fallbackId?: string; note: string };
+  vacationPlans: VacationPlan[]; vacationImpacts?: VacationImpact[]; manualMixedSegments?: string[]; segmentBaselines?: SegmentBaseline[]; parentId?: string; demo?: boolean; run?: { attempts: number; duration: number; fallbackId?: string; note: string; preparation?: {sourceVersionId?:string;carrySegments:number;pendingDebts:Debt[]} };
 }
 export interface VacationPlan { id: string; employeeId: string; month: string; dates: string[]; reason: string; source: 'manual' | 'import'; created: string; updated: string }
 export interface Debt { id: string; employeeId: string; category: Category; origin: string; due: string; note: string }

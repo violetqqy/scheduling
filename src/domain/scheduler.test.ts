@@ -67,19 +67,19 @@ describe('约束排班', () => {
 })
 
 describe('工作段、跨月、光子轮换', () => {
-  it('连续周末不产生零天段，个人休息可产生4/6天段', () => {
+  it('连续周末不产生零天段，仅开班日历调休产生4/6天段', () => {
     const db = fixture(), v = newVersion(db,'2026-06'), e = db.employees[0]!
-    v.cells[key(e.id,'2026-06-05')] = { kind:'rest',source:'manual',locked:true }
-    v.cells[key(e.id,'2026-06-13')] = { kind:'unassigned',source:'manual',locked:false }
+    v.calendar['2026-06-05']=false
+    v.calendar['2026-06-13']=true
     const lengths = workSegments(db,v,e).map(s => s.dates.length)
     expect(lengths).toContain(4); expect(lengths).toContain(6); expect(lengths.every(n => n > 0)).toBe(true)
   })
-  it('请假默认不切段，选定规则后可切段', () => {
+  it('请假固定不切段，即使旧规则快照含切段开关', () => {
     const db = fixture(), v = newVersion(db,'2026-06'), e = db.employees[0]!
     v.cells[key(e.id,'2026-06-03')] = { kind:'leave',source:'manual',locked:true }
     expect(workSegments(db,v,e).find(s => s.start === '2026-06-01')?.end).toBe('2026-06-05')
     v.ruleSettings.leaveSplits = true
-    expect(workSegments(db,v,e).find(s => s.start === '2026-06-01')?.end).toBe('2026-06-02')
+    expect(workSegments(db,v,e).find(s => s.start === '2026-06-01')?.end).toBe('2026-06-05')
   })
   it('跨月沿用原班，缺失历史不编造续段', () => {
     const db = fixture(18), previous = mount(db,newVersion(db,'2026-06'))
@@ -103,16 +103,17 @@ describe('工作段、跨月、光子轮换', () => {
     expect(Object.entries(result.version.cells).some(([k,c]) => k.startsWith('e0|') && c.kind === 'shift' && c.shiftId === 'photon')).toBe(false)
     expect(result.debts.filter(d => d.employeeId === 'e0' && d.category === '白')).toHaveLength(1)
     db.debts.push(...result.debts)
-    expect(generate(db,'2026-07','rebuild',1).debts.filter(d => d.employeeId === 'e0')).toHaveLength(0)
+    const again=generate(db,'2026-07','rebuild',1).debts
+    expect(new Set(again.map(d=>d.id)).size).toBe(again.length)
+    expect(again.filter(d=>d.id.startsWith('photon-white:') && d.employeeId==='e0')).toHaveLength(1)
   })
-  it('光子跨月默认暴露待决定冲突，明确续排后仅允许原段', () => {
+  it('光子固定允许跨月续完，本月不再新开该员工的光子段', () => {
     const db = fixture(), prev = mount(db,newVersion(db,'2026-06'))
     for (const d of ['2026-06-29','2026-06-30']) prev.cells[key('e0',d)] = { kind:'shift',shiftId:'photon',source:'auto',locked:false }
-    let next = generate(db,'2026-07','rebuild',1).version
-    expect(validate(db,next).some(i => i.rule === 'D01' && i.employeeId === 'e0')).toBe(true)
-    db.rules.photonCarry = 'continue'; next = generate(db,'2026-07','rebuild',1).version
+    const next = generate(db,'2026-07','rebuild',1).version
     expect(validate(db,next).some(i => i.rule === 'D01')).toBe(false)
     expect(next.cells[key('e0','2026-07-01')]?.shiftId).toBe('photon')
+    expect(Object.entries(next.cells).filter(([k,c])=>k.startsWith('e0|') && k.split('|')[1]!>'2026-07-03' && c.shiftId==='photon')).toEqual([])
   })
   it('历史版本需求快照不随全局开关变化', () => {
     const db = fixture(), v = newVersion(db,'2026-06'); db.shifts[0]!.enabled = false

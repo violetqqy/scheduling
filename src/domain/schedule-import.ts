@@ -1,7 +1,7 @@
 import type { Database, ImportRow } from './types'
 import { addMonths, uid } from './dates'
 import { activeVersion, editableVersion, inputHash, key, newVersion } from './model'
-import { makeOvertimeCell, saveVacationPlan, vacationOn } from './absences'
+import { checkCell, makeOvertimeCell, saveVacationPlan, vacationOn } from './absences'
 
 export function applyScheduleImport(draft: Database, rows: ImportRow[], target: string, purpose: string, filename: string, allowNew: boolean) {
     const included = rows.filter(r => !r.skip)
@@ -11,6 +11,7 @@ export function applyScheduleImport(draft: Database, rows: ImportRow[], target: 
     if (!selectedRows.length) throw new Error('没有符合所选用途的数据，请核对预览中的休假 / 请假类型与导入用途')
     const identities = new Map<string,string>()
     for (const r of selectedRows) {
+      checkCell(draft,r.cell!)
       if (!r.date.startsWith(target)) throw new Error('导入日期与目标月份不一致')
       const identity=r.code || r.name
       if (identities.has(identity) && identities.get(identity) !== r.name) throw new Error('同一员工编号对应多个姓名，请先核对名单')
@@ -33,6 +34,7 @@ export function applyScheduleImport(draft: Database, rows: ImportRow[], target: 
     for (const row of included) {
       const employeeId = row.employeeId || mapping.get(row.code || row.name)!
       if (!row.cell) continue
+      if(!v.employeeIds.includes(employeeId))v.employeeIds.push(employeeId)
       if (purpose === 'vacation' && row.cell.kind !== 'vacation' || purpose === 'leave' && row.cell.kind !== 'leave' || purpose === 'availability' && row.cell.kind !== 'rest') continue
       if (row.cell.kind === 'vacation') {
         const existing = vacationOn(draft,employeeId,row.date)
@@ -42,10 +44,6 @@ export function applyScheduleImport(draft: Database, rows: ImportRow[], target: 
         if (row.cell.overtimeBase?.kind==='vacation' && !vacationOn(draft,employeeId,row.date)) saveVacationPlan(draft,{employeeId,month:target,dates:[row.date],reason:row.cell.overtimeBase.note || '导入加班前的预定休假',source:'import'})
         v.cells[key(employeeId,row.date)]=makeOvertimeCell(draft,employeeId,row.date,row.cell,v)
       } else {
-        if (vacationOn(draft,employeeId,row.date) && row.cell.kind !== 'leave') {
-          if (['history','schedule'].includes(purpose)) throw new Error(`${row.date}已有预定休假，与导入排班冲突；请先核对休假计划`)
-          continue
-        }
         v.cells[key(employeeId,row.date)] = structuredClone(row.cell)
       }
     }
